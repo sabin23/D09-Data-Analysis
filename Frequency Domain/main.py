@@ -4,7 +4,7 @@ import numpy as np
 
 # Load the data
 mat = scipy.io.loadmat("D:/Downloads/ae2224I_measurement_data_2024 (1)/ae2224I_measurement_data_subj1_C1.mat")
-ft= mat['ft']
+ft= mat['u']
 t = mat['t']
 
 # Calculate the FFT
@@ -19,9 +19,10 @@ positive_frequencies = frequencies[:N//2]
 positive_fft_result = fft_result[:N//2]
 
 # Plot the Fourier transform for positive frequencies
-plt.plot(positive_frequencies, np.abs(positive_fft_result))
+plt.plot(frequencies, np.abs(fft_result))
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Magnitude')
 plt.title('Fourier Transform of u (Positive Frequencies)')
 plt.grid()
+plt.xlim(0, 5)
 plt.show()
