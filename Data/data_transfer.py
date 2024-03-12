@@ -2,23 +2,19 @@ import os
 import pandas as pd
 import scipy.io as sio
 
-# Specify the directory containing the MATLAB files
-mat_dir = "Data"
+class Data:
+    def __init__(self, subject, condition):
+        mat = sio.loadmat(f"./Data/ae2224I_measurement_data_subj{subject}_C{condition}.mat")
+        print(mat)
+        self.u = mat['u']
+        self.t = mat['t']
+        self.x = mat['x']
+        self.ft = mat['ft']
+        self.fd = mat['fd']
+        self.e = mat['e']
+        self.Hpxd_FC = mat['Hpxd_FC']
+        self.Hpe_FC = mat['Hpe_FC']
+        self.w_FC = mat['w_FC']
 
-# Iterate over all files in the directory
-for filename in os.listdir(mat_dir):
-    if filename.endswith(".mat"):
-        # Load the contents of the MATLAB file
-        mat_contents = sio.loadmat(os.path.join(mat_dir, filename))
 
-        # Convert the MATLAB contents to a pandas DataFrame
-        df = pd.DataFrame(mat_contents)
 
-        # Specify the path to the new CSV file
-        csv_filename = os.path.splitext(filename)[0] + "data.csv"
-        csv_filepath = os.path.join(mat_dir, csv_filename)
-
-        # Save the DataFrame to the CSV file
-        df.to_csv(csv_filepath, index=False)
-
-        print(f"Saved CSV file: {csv_filepath}")
