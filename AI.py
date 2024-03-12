@@ -1,6 +1,6 @@
 import scipy.io
 import matplotlib.pyplot as plt
-from Data\data_transfer.py import Data
+from get_data import Data
 
 
 
