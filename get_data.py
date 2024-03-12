@@ -5,7 +5,7 @@ import scipy.io as sio
 class Data:
     def __init__(self, subject, condition):
         mat = sio.loadmat(f"./Data/ae2224I_measurement_data_subj{subject}_C{condition}.mat")
-        print(mat)
+        #print(mat)
         self.u = mat['u']
         self.t = mat['t']
         self.x = mat['x']
