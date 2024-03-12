@@ -14,5 +14,3 @@ ax.set(xlabel='time (s)', ylabel='u',
 ax.grid()
 plt.show()
 
-
-
