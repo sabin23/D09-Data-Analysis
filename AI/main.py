@@ -18,3 +18,5 @@ ax.set(xlabel='time (s)', ylabel='u',
        title='u-t')
 ax.grid()
 plt.show()
+
+print(u)
