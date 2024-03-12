@@ -9,7 +9,6 @@ t = mat['t']
 
 # Calculate the FFT
 fft_result = np.fft.fft(ft[:, 0])  # Assuming you want to perform FFT on the first column of u
-
 # Calculate the frequency axis
 dt = t[0, 1] - t[0, 0]  # Assuming uniform time sampling
 N = len(ft)  # Number of samples
