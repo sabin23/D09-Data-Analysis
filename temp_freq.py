@@ -90,8 +90,10 @@ t = mat[a][b].t
 
 # Get magnitude and phase of numbers in Hpe_FC
 Hpe_FC = mat[a][b].Hpe_FC
-magnitude_Hpe = np.abs(Hpe_FC)
-magnitude_Hpe = 10 * np.log(magnitude_Hpe)
+hper = np.real(Hpe_FC)
+hpec = np.imag(Hpe_FC)
+magnitude_Hpe = np.sqrt(np.square(hper)+np.square(hpec))
+
 phase_Hpe = np.angle(Hpe_FC, deg=True)
 
 for i in range(len(phase_Hpe)):
