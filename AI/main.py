@@ -17,4 +17,13 @@ hpec = np.imag(hpe)
 
 mag = np.sqrt(np.square(hper)+np.square(hpec))
 
-print(mag)
+freq = mat['w_FC']
+
+print(freq)
+
+plt.plot(freq, mag)
+plt.xlabel('frequency')
+plt.ylabel('magnitude')
+plt.title('bode plot')
+plt.grid(True)
+plt.show()
