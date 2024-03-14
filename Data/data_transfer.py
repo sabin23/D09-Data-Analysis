@@ -15,6 +15,7 @@ class Data:
         self.Hpxd_FC = mat['Hpxd_FC']
         self.Hpe_FC = mat['Hpe_FC']
         self.w_FC = mat['w_FC']
-
+        
+         
 
 
