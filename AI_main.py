@@ -4,11 +4,16 @@ from get_data import Data
 
 data = Data(1,1)
 print(data.u)
+<<<<<<< HEAD
 fig, ax = plt.subplots()
 ax.plot(data.t[0], data.u[:,0])
+=======
+# fig, ax = plt.subplots()
+# ax.plot(t[0], u[:,0])
+>>>>>>> AI_1
 
-ax.set(xlabel='time (s)', ylabel='u',
-       title='u-t')
-ax.grid()
-plt.show()
+# ax.set(xlabel='time (s)', ylabel='u',
+#        title='u-t')
+# ax.grid()
+# plt.show()
 
