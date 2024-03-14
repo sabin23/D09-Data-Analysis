@@ -82,7 +82,7 @@ def plot_FFT():
     plt.show()
 
 
-a, b = 1, 1
+a, b = 5, 5
 # Load a condition
 ft = mat[a][b].ft
 u = mat[a][b].u
