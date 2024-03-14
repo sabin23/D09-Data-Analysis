@@ -2,7 +2,7 @@ import scipy.io
 import matplotlib.pyplot as plt
 import numpy as np
 from get_data import Data
-
+from scipy.signal import find_peaks
 # Load the data
 mat = []
 for i in range(1, 7):
@@ -11,7 +11,6 @@ for i in range(1, 7):
         line.append(Data(i, j))
     mat.append(line)
 
-TEST
 ft = mat[2][2].ft
 u = mat[2][2].u
 t = mat[2][2].t
@@ -36,11 +35,46 @@ difference_in_frequencies = positive_frequencies
 # Perform noise cancellation
 noise_cancelled_result = np.abs(positive_fft_result_u) - np.abs(positive_fft_result_ft)
 
-# Plot the Fourier transform of the noise-cancelled signal
-plt.plot(difference_in_frequencies, noise_cancelled_result)
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.title('Noise-cancelled Fourier Transform')
-plt.grid()
-plt.xlim(0, 5)
-plt.show()
+def plot(difference_in_frequencies,noise_cancelled_result,positive_fft_result_u, positive_fft_result_ft):
+    # Plot 1: FFT of noise-cancelled signal
+    plt.figure(figsize=(14, 6))
+    
+    # Plot 1: FFT of noise-cancelled signal
+    plt.subplot(1, 3, 1)
+    plt.plot(difference_in_frequencies, np.abs(noise_cancelled_result))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude')
+    plt.title('Noise-cancelled Fourier Transform')
+    plt.xlim(0, 5)
+    
+    # Plot 2: FFT of u
+    plt.subplot(1, 3, 2)
+    plt.plot(difference_in_frequencies, np.abs(positive_fft_result_u))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude')
+    plt.title('FFT of u')
+    plt.xlim(0, 5)
+    # Plot 3: FFT of ft
+    plt.subplot(1, 3, 3)
+    plt.plot(difference_in_frequencies, np.abs(positive_fft_result_ft))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude')
+    plt.title('FFT of ft')
+    plt.grid()
+    plt.xlim(0, 5)
+    
+    # Find peaks in the FFT of ft
+    peaks, _ = find_peaks(np.abs(positive_fft_result_ft))
+    
+    # Get corresponding frequencie
+    peak_frequencies = difference_in_frequencies[peaks]
+    
+    # Plot the peaks on the FFT of f
+    plt.plot(difference_in_frequencies[peaks], np.abs(positive_fft_result_ft)[peaks], 'ro')  # Mark peaks with red dots
+    plt.xlim(0, 5)
+    plt.grid()
+    plt.show()
+    
+    print("Frequencies of the peaks in FFT of ft:", peak_frequencies)
+
+plot(difference_in_frequencies,noise_cancelled_result,positive_fft_result_u, positive_fft_result_ft)
