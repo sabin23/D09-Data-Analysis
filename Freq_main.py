@@ -11,6 +11,7 @@ for i in range(1, 7):
         line.append(Data(i, j))
     mat.append(line)
 
+TEST
 ft = mat[2][2].ft
 u = mat[2][2].u
 t = mat[2][2].t
