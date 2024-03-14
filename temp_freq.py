@@ -18,14 +18,14 @@ def plot_Bode():
     fig, axs = plt.subplots(2)
 
     # Plot the magnitude of Hpe_FC in the first subplot
-    axs[0].semilogx(frequencies, magnitude_Hpe)
+    axs[0].semilogx(w_FC, magnitude_Hpe)
     axs[0].set_title('Magnitude of Hpe_FC')
     axs[0].set_xlabel('Frequency (Hz)')
     axs[0].set_ylabel('Magnitude')
     axs[0].grid()
 
     # Plot the phase of Hpe_FC in the second subplot
-    axs[1].semilogx(frequencies, phase_Hpe)
+    axs[1].semilogx(w_FC, phase_Hpe)
     axs[1].set_title('Phase of Hpe_FC')
     axs[1].set_xlabel('Frequency (Hz)')
     axs[1].set_ylabel('Phase (degrees)')
@@ -93,13 +93,19 @@ Hpe_FC = mat[a][b].Hpe_FC
 magnitude_Hpe = np.abs(Hpe_FC)
 magnitude_Hpe = 10 * np.log(magnitude_Hpe)
 phase_Hpe = np.angle(Hpe_FC, deg=True)
+
 for i in range(len(phase_Hpe)):
     if phase_Hpe[i] >= 0:
         phase_Hpe[i] -= 360 
-
+    if i != len(phase_Hpe)-1:
+        if phase_Hpe[i] <= -181 and phase_Hpe[i+1] >= -181:
+            phase_Hpe[i+1] -= 360
+        
+print(phase_Hpe)
 w_FC = mat[a][b].w_FC
+
 frequencies = np.linspace(0, 100, 100)
-print(frequencies)
+#print(frequencies)
 
 
 plot_Bode()
