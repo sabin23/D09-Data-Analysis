@@ -27,7 +27,7 @@ print(u)
 u = mat[1][1].u
 u1 = np.concatenate(u)
 t = mat[1][1].t
-#Code doesnt work atm because I'm trying to format it so that we can put e or u in function arguments to make code more efficient
+#Code doesnt work atm because I'm trying to format it so that we can put e or u in function arguments to make the code more efficient
 #rather than rewriting functions 4 times.
 def sort_into_test_runs_NM(choice):
     u_1 = []
@@ -37,7 +37,10 @@ def sort_into_test_runs_NM(choice):
     u_5 = []
     for i in range(1,7):
         for j in range(1,4):
-            matrix = mat[i-1][j-1].format(choice)
+            if choice == 'e':
+                matrix = mat[i-1][j-1].e
+            if choice == 'u':
+                matrix = mat[i-1][j-1].u
             u1 = []   #Creating empty sublists here which lets me put all values per run per pilot
             u2 = []
             u3 = []
@@ -66,7 +69,10 @@ def sort_into_test_runs_M(choice):
     u_5 = []
     for i in range(1,7):
         for j in range(4,7):
-            matrix = mat[i-1][j-1].format(choice)
+            if choice == 'e':
+                matrix = mat[i-1][j-1].e
+            if choice == 'u':
+                matrix = mat[i-1][j-1].u
             u1 = []   #Creating empty sublists here which lets me put all values per run per pilot
             u2 = []
             u3 = []
@@ -99,15 +105,27 @@ e_average_variances_NM = average_variance_per_run(e_runs_NM)
 e_runs_M = sort_into_test_runs_M(choice = 'e')
 e_average_variances_M = average_variance_per_run(e_runs_M)
 
+u_runs_NM = sort_into_test_runs_NM(choice = 'u')
+u_average_variances_NM = average_variance_per_run(u_runs_NM)
+
+u_runs_M = sort_into_test_runs_M(choice = 'u')
+u_average_variances_M = average_variance_per_run(u_runs_M)
+
 #Checking data
 print(e_average_variances_NM)
 print(e_average_variances_M)
+print(u)
 
 #Plotting
 run = [1, 2, 3, 4, 5]
 
+plt.subplot(1,2,1)
 plt.plot(run, e_average_variances_NM)
 plt.plot(run, e_average_variances_M)
+plt.subplot(1,2,2)
+plt.plot(run, u_average_variances_NM)
+plt.plot(run, u_average_variances_M)
+
 plt.show()
 
 
