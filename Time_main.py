@@ -21,21 +21,107 @@ x = mat[2][2].x
 
 print(u)
 
-"""
-
+""" 
+# To do: find variance of each pilot for each run, then find average variance for each run and plot  
 #Compile control and error data for NM case:
 u = mat[1][1].u
 u1 = np.concatenate(u)
 t = mat[1][1].t
-
-def sort_into_test_runs_NM():
+#Code doesnt work atm because I'm trying to format it so that we can put e or u in function arguments to make code more efficient
+#rather than rewriting functions 4 times.
+def sort_into_test_runs_NM(choice):
     u_1 = []
     u_2 = []
     u_3 = []
     u_4 = []
     u_5 = []
     for i in range(1,7):
-        for j in range(2,3):
+        for j in range(1,4):
+            matrix = mat[i-1][j-1].format(choice)
+            u1 = []   #Creating empty sublists here which lets me put all values per run per pilot
+            u2 = []
+            u3 = []
+            u4 = []
+            u5 = []
+            for value in matrix:
+                u1.append(value[0])
+                u2.append(value[1])
+                u3.append(value[2])
+                u4.append(value[3])
+                u5.append(value[4])
+            u_1.append(np.var(u1)) #These append the variances of the sublists containing signal per run per pilot
+            u_2.append(np.var(u2))
+            u_3.append(np.var(u3))
+            u_4.append(np.var(u4))
+            u_5.append(np.var(u5))
+    
+    runs = [u_1, u_2, u_3, u_4, u_5]
+    return runs
+
+def sort_into_test_runs_M(choice):
+    u_1 = []
+    u_2 = []
+    u_3 = []
+    u_4 = []
+    u_5 = []
+    for i in range(1,7):
+        for j in range(4,7):
+            matrix = mat[i-1][j-1].format(choice)
+            u1 = []   #Creating empty sublists here which lets me put all values per run per pilot
+            u2 = []
+            u3 = []
+            u4 = []
+            u5 = []
+            for value in matrix:
+                u1.append(value[0])
+                u2.append(value[1])
+                u3.append(value[2])
+                u4.append(value[3])
+                u5.append(value[4])
+            u_1.append(np.var(u1)) #These append the variances of the sublists containing signal per run per pilot
+            u_2.append(np.var(u2))
+            u_3.append(np.var(u3))
+            u_4.append(np.var(u4))
+            u_5.append(np.var(u5))
+    
+    runs = [u_1, u_2, u_3, u_4, u_5]
+    return runs
+
+def average_variance_per_run(runs):
+    average_variances = []
+    for run in runs:
+        average_variances.append(np.mean(run))
+    return average_variances
+
+e_runs_NM = sort_into_test_runs_NM(choice = 'e')
+e_average_variances_NM = average_variance_per_run(e_runs_NM)
+
+e_runs_M = sort_into_test_runs_M(choice = 'e')
+e_average_variances_M = average_variance_per_run(e_runs_M)
+
+#Checking data
+print(e_average_variances_NM)
+print(e_average_variances_M)
+
+#Plotting
+run = [1, 2, 3, 4, 5]
+
+plt.plot(run, e_average_variances_NM)
+plt.plot(run, e_average_variances_M)
+plt.show()
+
+
+
+#Code graveyard down here
+""" ***OLD METHOD***
+def sort_into_test_runs_NM2():
+    u_1 = []
+    u_2 = []
+    u_3 = []
+    u_4 = []
+    u_5 = []
+    for i in range(1,7):
+        for j in range(1,4):
             matrix = mat[i-1][j-1].e
             for value in matrix:
                 u_1.append(value[0])
@@ -47,14 +133,14 @@ def sort_into_test_runs_NM():
     runs = [u_1, u_2, u_3, u_4, u_5]
     return runs
 
-def sort_into_test_runs_M():
+def sort_into_test_runs_M2():
     u_1 = []
     u_2 = []
     u_3 = []
     u_4 = []
     u_5 = []
     for i in range(1,7):
-        for j in range(5,6):
+        for j in range(4,7):
             matrix = mat[i-1][j-1].e
             for value in matrix:
                 u_1.append(value[0])
@@ -66,8 +152,8 @@ def sort_into_test_runs_M():
     runs = [u_1, u_2, u_3, u_4, u_5]
     return runs
 
-u_runs_NM = sort_into_test_runs_NM()
-u_runs_M = sort_into_test_runs_M()
+runs_NM2 = sort_into_test_runs_NM2()
+runs_M2 = sort_into_test_runs_M2()
 
 def turn_into_list(runs):
     variances = []
@@ -76,40 +162,17 @@ def turn_into_list(runs):
 
     return variances
 
-variances_u_NM = turn_into_list(u_runs_NM)
-variances_u_M = turn_into_list(u_runs_M)
+variances_u_NM = turn_into_list(runs_NM2)
+variances_u_M = turn_into_list(runs_M2)
     
-
-
-
-
-
-run = [1, 2, 3, 4, 5]
-
-
-            
+print(variances_u_NM)
+print(variances_u_M)
 
 plt.plot(run, variances_u_NM)
 plt.plot(run, variances_u_M)
 plt.show()
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"""
 #u_run1 = []
 #u_run2 = []
 #u_run3 = []
