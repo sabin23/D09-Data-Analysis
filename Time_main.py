@@ -119,12 +119,21 @@ print(u_average_variances_M)
 #Plotting
 run = [1, 2, 3, 4, 5]
 
+m, b, c, d = np.polyfit(np.array(run), np.array(e_average_variances_NM), 3)
+#m*(np.array(run))**2 + b*np.array(run) + c
 plt.subplot(1,2,1)
-plt.plot(run, e_average_variances_NM)
-plt.plot(run, e_average_variances_M)
+plt.xlabel("Number of runs (1-5)")
+plt.ylabel("Average Error Signal Variance")
+plt.grid()
+plt.scatter(run, e_average_variances_NM, marker = "o")
+plt.plot(np.array(run), m*(np.array(run))**3 + b*(np.array(run))**2 + c*(np.array(run)) + d)
+plt.plot(run, e_average_variances_M, marker = 'x')
 plt.subplot(1,2,2)
-plt.plot(run, u_average_variances_NM)
-plt.plot(run, u_average_variances_M)
+plt.xlabel("Number of runs (1-5)")
+plt.ylabel("Average Control Signal Variance")
+plt.grid()
+plt.plot(run, u_average_variances_NM, marker = 'o')
+plt.plot(run, u_average_variances_M, marker = 'x')
 
 plt.show()
 
