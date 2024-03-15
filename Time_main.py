@@ -27,8 +27,7 @@ print(u)
 u = mat[1][1].u
 u1 = np.concatenate(u)
 t = mat[1][1].t
-#Code doesnt work atm because I'm trying to format it so that we can put e or u in function arguments to make the code more efficient
-#rather than rewriting functions 4 times.
+
 def sort_into_test_runs_NM(choice):
     u_1 = []
     u_2 = []
@@ -114,7 +113,8 @@ u_average_variances_M = average_variance_per_run(u_runs_M)
 #Checking data
 print(e_average_variances_NM)
 print(e_average_variances_M)
-print(u)
+print(u_average_variances_NM)
+print(u_average_variances_M)
 
 #Plotting
 run = [1, 2, 3, 4, 5]
