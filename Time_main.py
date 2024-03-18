@@ -118,7 +118,7 @@ print(u_average_variances_M)
 
 #Plotting
 run = [1, 2, 3, 4, 5]
-
+#TODO: Do regression with stats instead of numpy maybe???
 m, b, c, d = np.polyfit(np.array(run), np.array(e_average_variances_NM), 3)
 #m*(np.array(run))**2 + b*np.array(run) + c
 plt.subplot(1,2,1)
