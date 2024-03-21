@@ -277,10 +277,226 @@ def plot_motion_nomotion_average():
     plt.tight_layout()
     plt.show()
 
+def compare_6_conditions():
+    fig, axs = plt.subplots(2, 3)
+    w_FC = mat[0][0].w_FC
+
+    # Position NM
+    condition = 0
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+
+            if pilot == 0:
+                magnitude_Hpe_avg = magnitude_Hpe
+                phase_Hpe_avg = phase_Hpe
+            else:
+                magnitude_Hpe_avg += magnitude_Hpe
+                phase_Hpe_avg += phase_Hpe
+            
+    average_magnitude_NM = magnitude_Hpe_avg / 6
+    average_phase_NM = phase_Hpe_avg / 6
+    # Plot the average magnitude of Hpe_FC in the first subplot [0, 0], plot average phase in [0, 1] 
+    axs[0, 0].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    axs[1, 0].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    axs[0, 0].set_title('Magnitude Position')
+    axs[1, 0].set_title('Phase Position')
+
+    # Velocity NM
+    condition = 1
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+
+            if pilot == 0:
+                magnitude_Hpe_avg = magnitude_Hpe
+                phase_Hpe_avg = phase_Hpe
+            else:
+                magnitude_Hpe_avg += magnitude_Hpe
+                phase_Hpe_avg += phase_Hpe
+            
+    average_magnitude_NM = magnitude_Hpe_avg / 6
+    average_phase_NM = phase_Hpe_avg / 6
+    # Plot the average magnitude of Hpe_FC in the first subplot [0, 0], plot average phase in [0, 1] 
+    axs[0, 1].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    axs[1, 1].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    axs[0, 1].set_title('Magnitude Velocity')
+    axs[1, 1].set_title('Phase Velocity')
+
+    # Acceleration NM
+    condition = 2
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+
+            if pilot == 0:
+                magnitude_Hpe_avg = magnitude_Hpe
+                phase_Hpe_avg = phase_Hpe
+            else:
+                magnitude_Hpe_avg += magnitude_Hpe
+                phase_Hpe_avg += phase_Hpe
+    axs[0, 2].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    axs[1, 2].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    axs[0, 2].set_title('Magnitude Acceleration')
+    axs[1, 2].set_title('Phase Acceleration')
+
+    # Position M
+    condition = 3
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        Hpxd_FC = mat[pilot][condition].Hpxd_FC
+        hpxdr = np.real(Hpxd_FC)
+        hpxdc = np.imag(Hpxd_FC)
+        magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
+        phase_Hpxd = np.angle(Hpxd_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+                 if abs(phase_Hpxd[j] - phase_Hpxd[j + 1]) >= 180:
+                        phase_Hpxd[j + 1] -= 360
+
+        if pilot == 0:
+            magnitude_Hpe_avg = magnitude_Hpe
+            magnitude_Hpxd_avg = magnitude_Hpxd
+            phase_Hpe_avg = phase_Hpe
+            phase_Hpxd_avg = phase_Hpxd
+        else:
+            magnitude_Hpe_avg += magnitude_Hpe
+            magnitude_Hpxd_avg += magnitude_Hpxd
+            phase_Hpe_avg += phase_Hpe
+            phase_Hpxd_avg += phase_Hpxd
+    
+    average_magnitude_hpe_M = magnitude_Hpe_avg / 6
+    average_magnitude_hpxd_M = magnitude_Hpxd_avg / 6
+    average_phase_hpe_M = phase_Hpe_avg / 6
+    average_phase_hpxd_M = phase_Hpxd_avg / 6
+    axs[0, 0].semilogx(w_FC, average_magnitude_hpe_M, label='Hpe',)
+    axs[0, 0].semilogx(w_FC, average_magnitude_hpxd_M, label='Hpxd')
+    axs[1, 0].semilogx(w_FC, average_phase_hpe_M, label='Hpe')
+    axs[1, 0].semilogx(w_FC, average_phase_hpxd_M, label='Hpxd')
+    axs[0, 0].legend()
+    axs[1, 0].legend()
+
+    # Velocity M
+    condition = 4
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        Hpxd_FC = mat[pilot][condition].Hpxd_FC
+        hpxdr = np.real(Hpxd_FC)
+        hpxdc = np.imag(Hpxd_FC)
+        magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
+        phase_Hpxd = np.angle(Hpxd_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+                 if abs(phase_Hpxd[j] - phase_Hpxd[j + 1]) >= 180:
+                        phase_Hpxd[j + 1] -= 360
+
+        if pilot == 0:
+            magnitude_Hpe_avg = magnitude_Hpe
+            magnitude_Hpxd_avg = magnitude_Hpxd
+            phase_Hpe_avg = phase_Hpe
+            phase_Hpxd_avg = phase_Hpxd
+        else:
+            magnitude_Hpe_avg += magnitude_Hpe
+            magnitude_Hpxd_avg += magnitude_Hpxd
+            phase_Hpe_avg += phase_Hpe
+            phase_Hpxd_avg += phase_Hpxd
+    
+    average_magnitude_hpe_M = magnitude_Hpe_avg / 6
+    average_magnitude_hpxd_M = magnitude_Hpxd_avg / 6
+    average_phase_hpe_M = phase_Hpe_avg / 6
+    average_phase_hpxd_M = phase_Hpxd_avg / 6
+    axs[0, 1].semilogx(w_FC, average_magnitude_hpe_M, label='Hpe')
+    axs[0, 1].semilogx(w_FC, average_magnitude_hpxd_M, label='Hpxd')
+    axs[1, 1].semilogx(w_FC, average_phase_hpe_M, label='Hpe')
+    axs[1, 1].semilogx(w_FC, average_phase_hpxd_M, label='Hpxd')
+    axs[0, 1].legend()
+    axs[1, 1].legend()
+
+    # Acceleration M
+    condition = 5
+    for pilot in range(0, 6):
+        Hpe_FC = mat[pilot][condition].Hpe_FC
+        hper = np.real(Hpe_FC)
+        hpec = np.imag(Hpe_FC)
+        magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+        phase_Hpe = np.angle(Hpe_FC, deg=True)
+        Hpxd_FC = mat[pilot][condition].Hpxd_FC
+        hpxdr = np.real(Hpxd_FC)
+        hpxdc = np.imag(Hpxd_FC)
+        magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
+        phase_Hpxd = np.angle(Hpxd_FC, deg=True)
+        for j in range(len(phase_Hpe)):
+            if j != len(phase_Hpe) - 1:
+                 if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                        phase_Hpe[j + 1] -= 360
+                 if abs(phase_Hpxd[j] - phase_Hpxd[j + 1]) >= 180:
+                        phase_Hpxd[j + 1] -= 360
+
+        if pilot == 0:
+            magnitude_Hpe_avg = magnitude_Hpe
+            magnitude_Hpxd_avg = magnitude_Hpxd
+            phase_Hpe_avg = phase_Hpe
+            phase_Hpxd_avg = phase_Hpxd
+        else:
+            magnitude_Hpe_avg += magnitude_Hpe
+            magnitude_Hpxd_avg += magnitude_Hpxd
+            phase_Hpe_avg += phase_Hpe
+            phase_Hpxd_avg += phase_Hpxd
+    
+    average_magnitude_hpe_M = magnitude_Hpe_avg / 6
+    average_magnitude_hpxd_M = magnitude_Hpxd_avg / 6
+    average_phase_hpe_M = phase_Hpe_avg / 6
+    average_phase_hpxd_M = phase_Hpxd_avg / 6
+    axs[0, 2].semilogx(w_FC, average_magnitude_hpe_M, label='Hpe')
+    axs[0, 2].semilogx(w_FC, average_magnitude_hpxd_M, label='Hpxd')
+    axs[1, 2].semilogx(w_FC, average_phase_hpe_M, label='Hpe')
+    axs[1, 2].semilogx(w_FC, average_phase_hpxd_M, label='Hpxd')
+    axs[0, 2].legend()
+    axs[1, 2].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
 frequencies = np.linspace(0, 100, 100)
 #print(frequencies)
 
 #plot_Bode(0, 0)
 #plot_FFT(0, 0)
 #plot_6_pilots(0)
-plot_motion_nomotion_average()
+#plot_motion_nomotion_average()
+compare_6_conditions()
+
