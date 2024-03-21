@@ -94,49 +94,64 @@ def plot_boxplots():
         for j in range(0, 6):
             hpe = 0
 
-a, b = 4, 5
-# Load a condition
-ft = mat[a][b].ft
-u = mat[a][b].u
-t = mat[a][b].t
+box = np.empty((6,20))
 
-# Get magnitude and phase of numbers in Hpe_FC
-Hpe_FC = mat[a][b].Hpe_FC
-hper = np.real(Hpe_FC)
-hpec = np.imag(Hpe_FC)
-magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
-phase_Hpe = np.angle(Hpe_FC, deg=True)
+for i in range(6):
 
-Hpxd_FC = mat[a][b].Hpxd_FC
-hpxdr = np.real(Hpxd_FC)
-hpxdc = np.imag(Hpxd_FC)
-magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
-phase_Hpxd = np.angle(Hpxd_FC, deg=True)
+    a, b = i, 0
+    # Load a condition
+    ft = mat[a][b].ft
+    u = mat[a][b].u
+    t = mat[a][b].t
+
+    # Get magnitude and phase of numbers in Hpe_FC
+    Hpe_FC = mat[a][b].Hpe_FC
+    hper = np.real(Hpe_FC)
+    hpec = np.imag(Hpe_FC)
+    magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
+    phase_Hpe = np.angle(Hpe_FC, deg=True)
+
+    Hpxd_FC = mat[a][b].Hpxd_FC
+    hpxdr = np.real(Hpxd_FC)
+    hpxdc = np.imag(Hpxd_FC)
+    magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
+    phase_Hpxd = np.angle(Hpxd_FC, deg=True)
 
 
-for i in range(len(phase_Hpe)):
-    if i != len(phase_Hpe) - 1:
-        if abs(phase_Hpe[i] - phase_Hpe[i + 1]) >= 180:
-            #for j in range(i + 1, len (phase_Hpe)):
-            phase_Hpe[i + 1] -= 360
+    for j in range(len(phase_Hpe)):
+        if j != len(phase_Hpe) - 1:
+            if abs(phase_Hpe[j] - phase_Hpe[j + 1]) >= 180:
+                #for j in range(i + 1, len (phase_Hpe)):
+                phase_Hpe[j + 1] -= 360
             
-        if phase_Hpe[i] * phase_Hpe[i + 1] < 0:
-            print(phase_Hpe[i], phase_Hpe[i + 1])
+            if phase_Hpe[j] * phase_Hpe[j + 1] < 0:
+                print(phase_Hpe[j], phase_Hpe[j + 1])
 
-for i in range(len(phase_Hpxd)):
-    if i != len(phase_Hpxd) - 1:
-        if abs(phase_Hpxd[i] - phase_Hpxd[i + 1]) >= 180:
-            #for j in range(i + 1, len (phase_Hpe)):
-            phase_Hpxd[i + 1] -= 360
+    for k in range(len(phase_Hpxd)):
+        if k != len(phase_Hpxd) - 1:
+            if abs(phase_Hpxd[k] - phase_Hpxd[k + 1]) >= 180:
+                #for j in range(i + 1, len (phase_Hpe)):
+                phase_Hpxd[k + 1] -= 360
             
-        if phase_Hpxd[i] * phase_Hpxd[i + 1] < 0:
-            print(phase_Hpxd[i], phase_Hpxd[i + 1])
+            if phase_Hpxd[k] * phase_Hpxd[k + 1] < 0:
+                print(phase_Hpxd[k], phase_Hpxd[k + 1])
+    box[i-1] = phase_Hpe.transpose()
 
 
 w_FC = mat[a][b].w_FC
 
-frequencies = np.linspace(0, 100, 100)
-#print(frequencies)
+print(box)
+
+fig, ax = plt.subplots()
+
+# Create boxplots side by side
+ax.boxplot(box)
+
+# Add title and labels
+plt.title('Boxplot')
+plt.xlabel('Freq')
+plt.ylabel('Phase')
 
 
-plot_Bode()
+# Show the plot
+plt.show()
