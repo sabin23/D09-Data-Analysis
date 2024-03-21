@@ -18,18 +18,24 @@ def plot_Bode():
     fig, axs = plt.subplots(2)
 
     # Plot the magnitude of Hpe_FC in the first subplot
-    axs[0].semilogx(w_FC, magnitude_Hpe)
+    axs[0].semilogx(w_FC, magnitude_Hpe, label='Hpe')
+    axs[0].semilogx(w_FC, magnitude_Hpxd, label='Hpxd')
+    axs[0].semilogx(w_FC, (magnitude_Hpe + magnitude_Hpxd) / 2, label='Average')
     axs[0].set_title('Magnitude of Hpe_FC')
     axs[0].set_xlabel('Frequency (Hz)')
     axs[0].set_ylabel('Magnitude')
     axs[0].grid()
+    axs[0].legend()
 
     # Plot the phase of Hpe_FC in the second subplot
-    axs[1].semilogx(w_FC, phase_Hpe)
+    axs[1].semilogx(w_FC, phase_Hpe, label='Hpe')
+    axs[1].semilogx(w_FC, phase_Hpxd, label='Hpxd')
+    axs[1].semilogx(w_FC, (phase_Hpe + phase_Hpxd) / 2, label='Average')
     axs[1].set_title('Phase of Hpe_FC')
     axs[1].set_xlabel('Frequency (Hz)')
     axs[1].set_ylabel('Phase (degrees)')
     axs[1].grid()
+    axs[1].legend()
 
     plt.tight_layout()
     plt.show()
@@ -81,8 +87,14 @@ def plot_FFT():
     plt.tight_layout()
     plt.show()
 
+def plot_boxplots():
+    magnitudes = []
+    phases = []
+    for i in range(0, 6):
+        for j in range(0, 6):
+            hpe = 0
 
-a, b = 4, 4
+a, b = 4, 5
 # Load a condition
 ft = mat[a][b].ft
 u = mat[a][b].u
@@ -92,9 +104,15 @@ t = mat[a][b].t
 Hpe_FC = mat[a][b].Hpe_FC
 hper = np.real(Hpe_FC)
 hpec = np.imag(Hpe_FC)
-magnitude_Hpe = np.sqrt(np.square(hper)+np.square(hpec))
-
+magnitude_Hpe = np.sqrt(np.square(hper) + np.square(hpec))
 phase_Hpe = np.angle(Hpe_FC, deg=True)
+
+Hpxd_FC = mat[a][b].Hpxd_FC
+hpxdr = np.real(Hpxd_FC)
+hpxdc = np.imag(Hpxd_FC)
+magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
+phase_Hpxd = np.angle(Hpxd_FC, deg=True)
+
 
 for i in range(len(phase_Hpe)):
     if i != len(phase_Hpe) - 1:
@@ -103,8 +121,17 @@ for i in range(len(phase_Hpe)):
             phase_Hpe[i + 1] -= 360
             
         if phase_Hpe[i] * phase_Hpe[i + 1] < 0:
-            print(phase_Hpe[i], phase_Hpe[i+1])
-        
+            print(phase_Hpe[i], phase_Hpe[i + 1])
+
+for i in range(len(phase_Hpxd)):
+    if i != len(phase_Hpxd) - 1:
+        if abs(phase_Hpxd[i] - phase_Hpxd[i + 1]) >= 180:
+            #for j in range(i + 1, len (phase_Hpe)):
+            phase_Hpxd[i + 1] -= 360
+            
+        if phase_Hpxd[i] * phase_Hpxd[i + 1] < 0:
+            print(phase_Hpxd[i], phase_Hpxd[i + 1])
+
 
 w_FC = mat[a][b].w_FC
 
