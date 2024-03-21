@@ -82,7 +82,7 @@ def plot_FFT():
     plt.show()
 
 
-a, b = 5, 5
+a, b = 4, 4
 # Load a condition
 ft = mat[a][b].ft
 u = mat[a][b].u
@@ -97,13 +97,15 @@ magnitude_Hpe = np.sqrt(np.square(hper)+np.square(hpec))
 phase_Hpe = np.angle(Hpe_FC, deg=True)
 
 for i in range(len(phase_Hpe)):
-    if phase_Hpe[i] >= 0:
-        phase_Hpe[i] -= 360 
-    if i != len(phase_Hpe)-1:
-        if phase_Hpe[i] <= -181 and phase_Hpe[i+1] >= -181:
-            phase_Hpe[i+1] -= 360
+    if i != len(phase_Hpe) - 1:
+        if abs(phase_Hpe[i] - phase_Hpe[i + 1]) >= 180:
+            #for j in range(i + 1, len (phase_Hpe)):
+            phase_Hpe[i + 1] -= 360
+            
+        if phase_Hpe[i] * phase_Hpe[i + 1] < 0:
+            print(phase_Hpe[i], phase_Hpe[i+1])
         
-print(phase_Hpe)
+
 w_FC = mat[a][b].w_FC
 
 frequencies = np.linspace(0, 100, 100)
