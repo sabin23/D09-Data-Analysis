@@ -52,16 +52,16 @@ def average_variance_per_run(runs):
         average_variances.append(np.mean(run))
     return average_variances
 
-e_runs_NM = sort_into_test_runs('e',1,4)
+e_runs_NM = sort_into_test_runs('e',3,4)
 e_average_variances_NM = average_variance_per_run(e_runs_NM)
 
-e_runs_M = sort_into_test_runs('e',4,7)
+e_runs_M = sort_into_test_runs('e',6,7)
 e_average_variances_M = average_variance_per_run(e_runs_M)
 
-u_runs_NM = sort_into_test_runs('u',1,4)
+u_runs_NM = sort_into_test_runs('u',3,4)
 u_average_variances_NM = average_variance_per_run(u_runs_NM)
 
-u_runs_M = sort_into_test_runs('u',4,7)
+u_runs_M = sort_into_test_runs('u',6,7)
 u_average_variances_M = average_variance_per_run(u_runs_M)
 
 #Checking data
@@ -113,7 +113,7 @@ print(len(average_variances_u_M))
 # Plotting
 run = [1, 2, 3, 4, 5]
 plt.subplot(1, 2, 1)
-plt.ylim(0,13)
+plt.ylim(0,27)
 plt.xlabel("Number of runs (1-5)")
 plt.ylabel("Average Error Variance")
 plt.grid()
@@ -122,7 +122,7 @@ plt.plot(run, e_average_variances_M, marker="o", label="M")
 
 plt.legend()
 plt.subplot(1, 2, 2)
-plt.ylim(0,13)
+plt.ylim(0,27)
 plt.xlabel("Number of runs (1-5)")
 plt.ylabel("Average Control Variance")
 plt.grid()
