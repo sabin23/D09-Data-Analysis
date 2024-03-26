@@ -149,7 +149,7 @@ ax.boxplot(box)
 
 # Add title and labels
 plt.title('Boxplot')
-plt.xlabel('Freq')
+plt.xlabel('Frequencies')
 plt.ylabel('Phase')
 
 
