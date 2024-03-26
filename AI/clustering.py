@@ -22,6 +22,7 @@ e = np.mean(e, axis=1)[:, np.newaxis]
 x = np.mean(x, axis=1)[:, np.newaxis]
 t = t.reshape(-1, 1)
 
+xdot = np.gradient(x, axis=0)
 
 xdot = np.mean(xdot, axis=1)[:, np.newaxis]
 combined_data = np.concatenate((e, xdot), axis=1)
