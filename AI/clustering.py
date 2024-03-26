@@ -14,6 +14,9 @@ data2 = Data(2, 2)
 e1 = data1.e
 e2 = data2.e
 t = data1.t
+x = data1.x
+
+
 
 rms_1 = np.sqrt(np.mean(e1**2))
 rms_2 = np.sqrt(np.mean(e2**2))
