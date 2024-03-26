@@ -43,3 +43,27 @@ plt.title('Noise-cancelled Fourier Transform')
 plt.grid()
 plt.xlim(0, 5)
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+print("penoos")
