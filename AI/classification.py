@@ -1,6 +1,7 @@
 import sys
 import torch
 import numpy as np
+
 # Add the parent directory to sys.path
 sys.path.append("..")
 
@@ -18,7 +19,9 @@ def dfdt (f, t):
 data = Data(1, 1)
 
 u1 = Data(1, 1).u
+print(u1)
 u2 = Data(1, 2).u
+print(u2)
 
 
 t = Data(1, 1).t[0]
@@ -28,8 +31,8 @@ x_t = x.transpose(1, 0)
 dxdt = np.zeros(x_t.shape)
 for i in range(0,len(x_t)):
     dxdt[i] = dfdt(x_t[i], t)
-print(dxdt)
-# dxdt = dfdt(x, t)
+
+
 
 
 
