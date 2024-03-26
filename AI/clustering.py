@@ -22,7 +22,16 @@ e = np.mean(e, axis=1)[:, np.newaxis]
 x = np.mean(x, axis=1)[:, np.newaxis]
 t = t.reshape(-1, 1)
 
-xdot = np.gradient(x, axis=0)
+def dfdt (f, t):
+    dfdt = np.zeros(f.shape)
+    for i in range(0, len(f)-1):
+        if i > 0 and i < len(f)-1:
+            dfdt[i] = (f[i+1] - f[i-1]) / (t[i+1] - t[i-1])
+    dfdt[len(f)-1] = dfdt[len(f)-2]
+    dfdt[0] = dfdt[1]
+    return dfdt
+
+xdot = dfdt(x, t)
 
 xdot = np.mean(xdot, axis=1)[:, np.newaxis]
 combined_data = np.concatenate((e, xdot), axis=1)
