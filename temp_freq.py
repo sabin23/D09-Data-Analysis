@@ -304,8 +304,8 @@ def compare_6_conditions():
     average_magnitude_NM = magnitude_Hpe_avg / 6
     average_phase_NM = phase_Hpe_avg / 6
     # Plot the average magnitude of Hpe_FC in the first subplot [0, 0], plot average phase in [0, 1] 
-    axs[0, 0].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
-    axs[1, 0].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    # axs[0, 0].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    # axs[1, 0].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
     axs[0, 0].set_title('Magnitude Position')
     axs[1, 0].set_title('Phase Position')
 
@@ -332,8 +332,8 @@ def compare_6_conditions():
     average_magnitude_NM = magnitude_Hpe_avg / 6
     average_phase_NM = phase_Hpe_avg / 6
     # Plot the average magnitude of Hpe_FC in the first subplot [0, 0], plot average phase in [0, 1] 
-    axs[0, 1].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
-    axs[1, 1].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    # axs[0, 1].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    # axs[1, 1].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
     axs[0, 1].set_title('Magnitude Velocity')
     axs[1, 1].set_title('Phase Velocity')
 
@@ -356,8 +356,8 @@ def compare_6_conditions():
             else:
                 magnitude_Hpe_avg += magnitude_Hpe
                 phase_Hpe_avg += phase_Hpe
-    axs[0, 2].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
-    axs[1, 2].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
+    # axs[0, 2].semilogx(w_FC, average_magnitude_NM, label=f'NM {condition + 1}')
+    # axs[1, 2].semilogx(w_FC, average_phase_NM, label=f'NM {condition + 1}')
     axs[0, 2].set_title('Magnitude Acceleration')
     axs[1, 2].set_title('Phase Acceleration')
 
