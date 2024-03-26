@@ -8,49 +8,40 @@ sys.path.append("..")
 
 from get_data import Data
 
-data1 = Data(2, 1)
-data2 = Data(2, 2)
+data = Data(2, 1)
 
-e1 = data1.e
-e2 = data2.e
-t = data1.t
-x = data1.x
+e = data.e
+x = data.x
+t = data.t
+
+rms = np.sqrt(np.mean(e**2))
+
+# combined_data = np.mean(np.concatenate((x, xdot), axis=0), axis=1)[:, np.newaxis]
+
+e = np.mean(e, axis=1)[:, np.newaxis]
+x = np.mean(x, axis=1)[:, np.newaxis]
+t = t.reshape(-1, 1)
 
 
-
-rms_1 = np.sqrt(np.mean(e1**2))
-rms_2 = np.sqrt(np.mean(e2**2))
-
-# combined_data = np.mean(np.concatenate((e1, e2), axis=0), axis=1)[:, np.newaxis]
-
-e2 = np.mean(e2, axis=1)[:, np.newaxis]
-
-# mf_indicator = np.concatenate((np.zeros((e1.shape[0], e1.shape[1])), np.ones((e2.shape[0], e2.shape[1]))), axis=0)
-# correlation = np.corrcoef(combined_data, mf_indicator)[0, 1]
-
-# features = np.concatenate((np.abs(combined_data), correlation[:, np.newaxis]), axis=1)
-
-# features = np.abs(combined_data)
-
-features = np.abs(e2)
+xdot = np.mean(xdot, axis=1)[:, np.newaxis]
+combined_data = np.concatenate((e, xdot), axis=1)
 
 n_clusters = 2
 
 kmeans = KMeans(n_clusters = n_clusters)
-kmeans.fit(features)
+kmeans.fit(combined_data)
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
 
 centroids_diff = np.linalg.norm(centroids[0] - centroids[1])
 
 print("Scalar difference between centroids:", centroids_diff)
-print("RMS e 1:", rms_1)
-print("RMS e 2:", rms_2)
+print("RMS e:", rms)
 
-plt.scatter(t, e2, c=labels, cmap='viridis', alpha=0.5, label='Data Points')
-# plt.scatter(centroids[:, 0], centroids[:, 1], marker='o', s=200, c='red', label='Centroids')
+plt.scatter(combined_data[:, 0], combined_data[:, 1], c=labels, cmap='viridis', alpha=0.5, label='Data Points')
+plt.scatter(centroids[:, 0], centroids[:, 1], marker='o', s=200, c='red', label='Centroids')
 plt.title('K-means Clustering')
-plt.xlabel('t')
-plt.ylabel('e2')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
 plt.legend()
 plt.show()
