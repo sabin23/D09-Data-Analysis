@@ -14,13 +14,13 @@ for i in range(1, 7):
 # To do: find variance of each pilot for each run, then find average variance for each run and plot  
 #Compile control and error data for NM case:
 
-def sort_into_test_runs(choice, a, b):
-    u_1 = []
+def sort_into_test_runs(choice, p1, p2, a, b):
+    u_1 = [] 
     u_2 = []
     u_3 = []
     u_4 = []
     u_5 = []
-    for i in range(1,7):
+    for i in range(p1,p2):
         for j in range(a,b):
             if choice == 'e':
                 matrix = mat[i-1][j-1].e
@@ -46,91 +46,183 @@ def sort_into_test_runs(choice, a, b):
     runs = [u_1, u_2, u_3, u_4, u_5]
     return runs
 
-def average_variance_per_run(runs):
-    average_variances = []
-    for run in runs:
-        average_variances.append(np.mean(run))
-    return average_variances
+#Sort data into P_NM, P_M, V_NM, V_M, A_NM, A_M in order to plot it as box and whisker plots.
+P_NM = []
+for i in range(2,8):
+    P_NM.append(np.mean(sort_into_test_runs('e', i-1, i, 1, 2)))
 
-e_runs_NM = sort_into_test_runs('e',3,4)
-e_average_variances_NM = average_variance_per_run(e_runs_NM)
+P_M = []
+for i in range(2,8):
+    P_M.append(np.mean(sort_into_test_runs('e', i-1, i, 4, 5)))
 
-e_runs_M = sort_into_test_runs('e',6,7)
-e_average_variances_M = average_variance_per_run(e_runs_M)
+V_NM = []
+for i in range(2,8):
+    V_NM.append(np.mean(sort_into_test_runs('e', i-1, i, 2, 3)))
 
-u_runs_NM = sort_into_test_runs('u',3,4)
-u_average_variances_NM = average_variance_per_run(u_runs_NM)
+V_M = []
+for i in range(2,8):
+    V_M.append(np.mean(sort_into_test_runs('e', i-1, i, 5, 6)))
 
-u_runs_M = sort_into_test_runs('u',6,7)
-u_average_variances_M = average_variance_per_run(u_runs_M)
+A_NM = []
+for i in range(2,8):
+    A_NM.append(np.mean(sort_into_test_runs('e', i-1, i, 3, 4)))
 
-#Checking data
-print(e_average_variances_NM)
-print(e_average_variances_M)
-print(u_average_variances_NM)
-print(u_average_variances_M)
-
+A_M = []
+for i in range(2,8):
+    A_M.append(np.mean(sort_into_test_runs('e', i-1, i, 6, 7)))
 
 
-# To do: find variance of each pilot for each run, then find average variance for each run and plot
+##########
 
-# Compile control and error data for NM case:
-u_NM = sort_into_test_runs('u',1,4)
-e_NM = sort_into_test_runs('e',1,4)
 
-# Compile control and error data for M case:
+P_NMu = []
+for i in range(2,8):
+    P_NMu.append(np.mean(sort_into_test_runs('u', i-1, i, 1, 2)))
 
-u_M = sort_into_test_runs('u',4,7)
-e_M = sort_into_test_runs('e',4,7)
+P_Mu = []
+for i in range(2,8):
+    P_Mu.append(np.mean(sort_into_test_runs('u', i-1, i, 4, 5)))
 
-# Calculate variances for each pilot and run in NM case:
-variances_u_NM = []
-variances_e_NM = []
-for i in range(5):
-    variances_u_NM.append([np.var(run) for run in u_NM[i]])
-    variances_e_NM.append([np.var(run) for run in e_NM[i]])
+V_NMu = []
+for i in range(2,8):
+    V_NMu.append(np.mean(sort_into_test_runs('u', i-1, i, 2, 3)))
 
-# Calculate variances for each pilot and run in M case:
-variances_u_M = []
-variances_e_M = []
-for i in range(5):
-    variances_u_M.append([np.var(run) for run in u_M[i]])
-    variances_e_M.append([np.var(run) for run in e_M[i]])
+V_Mu = []
+for i in range(2,8):
+    V_Mu.append(np.mean(sort_into_test_runs('u', i-1, i, 5, 6)))
 
-# Calculate average variances for each run in NM case:
-average_variances_u_NM = average_variance_per_run(variances_u_NM)
-average_variances_e_NM = average_variance_per_run(variances_e_NM)
+A_NMu = []
+for i in range(2,8):
+    A_NMu.append(np.mean(sort_into_test_runs('u', i-1, i, 3, 4)))
 
-# Calculate average variances for each run in M case:
-average_variances_u_M = average_variance_per_run(variances_u_M)
-average_variances_e_M = average_variance_per_run(variances_e_M)
+A_Mu = []
+for i in range(2,8):
+    A_Mu.append(np.mean(sort_into_test_runs('u', i-1, i, 6, 7)))
+    
 
-print(len(average_variances_e_NM))
-print(len(average_variances_e_M))
-print(len(average_variances_u_NM))
-print(len(average_variances_u_M))
+e_box = [np.array(P_NM),np.array(P_M),np.array(V_NM),np.array(V_M),np.array(A_NM),np.array(A_M)]
+print(e_box)
 
-# Plotting
-run = [1, 2, 3, 4, 5]
-plt.subplot(1, 2, 1)
-plt.ylim(0,27)
-plt.xlabel("Number of runs (1-5)")
-plt.ylabel("Average Error Variance")
-plt.grid()
-plt.plot(run, e_average_variances_NM, marker="o", label="NM")
-plt.plot(run, e_average_variances_M, marker="o", label="M")
+u_box = [np.array(P_NMu),np.array(P_Mu),np.array(V_NMu),np.array(V_Mu),np.array(A_NMu),np.array(A_Mu)]
+print(u_box)
 
-plt.legend()
-plt.subplot(1, 2, 2)
-plt.ylim(0,27)
-plt.xlabel("Number of runs (1-5)")
-plt.ylabel("Average Control Variance")
-plt.grid()
-plt.plot(run, u_average_variances_NM, marker="o", label="NM")
-plt.plot(run, u_average_variances_M, marker="o", label="M")
-plt.legend()
-plt.savefig('Variance.png')
+
+
+
+fig, ax = plt.subplots()
+
+# Create boxplots side by side
+
+# ax.boxplot(e_box)
+# ax.set_xticklabels(["$P_{NM}$", "$P_{M}$", "$V_{NM}$", "$V_{M}$", "$A_{NM}$", "$A_{M}$"])
+
+# # Add title and labels
+# plt.title('Boxplot')
+# plt.xlabel('Conditions')
+# plt.ylabel('Average Error Variance')
+
+
+ax.boxplot(u_box)
+ax.set_xticklabels(["$P_{NM}$", "$P_{M}$", "$V_{NM}$", "$V_{M}$", "$A_{NM}$", "$A_{M}$"])
+
+# Add title and labels
+plt.title('Boxplot')
+plt.xlabel('Conditions')
+plt.ylabel('Average Control Variance')
+
+
+
+# Show the plot
 plt.show()
+
+
+
+
+# def average_variance_per_run(runs):
+#     average_variances = []
+#     for run in runs:
+#         average_variances.append(np.mean(run))
+#     return average_variances
+
+# e_runs_NM = sort_into_test_runs('e',1,2)
+# e_average_variances_NM = average_variance_per_run(e_runs_NM)
+
+# e_runs_M = sort_into_test_runs('e',4,5)
+# e_average_variances_M = average_variance_per_run(e_runs_M)
+
+# u_runs_NM = sort_into_test_runs('u',1,2)
+# u_average_variances_NM = average_variance_per_run(u_runs_NM)
+
+# u_runs_M = sort_into_test_runs('u',4,5)
+# u_average_variances_M = average_variance_per_run(u_runs_M)
+
+# #Checking data
+# print(e_average_variances_NM)
+# print(e_average_variances_M)
+# print(u_average_variances_NM)
+# print(u_average_variances_M)
+
+
+
+# # To do: find variance of each pilot for each run, then find average variance for each run and plot
+
+# # Compile control and error data for NM case:
+# u_NM = sort_into_test_runs('u',1,4)
+# e_NM = sort_into_test_runs('e',1,4)
+
+# # Compile control and error data for M case:
+
+# u_M = sort_into_test_runs('u',4,7)
+# e_M = sort_into_test_runs('e',4,7)
+
+# # Calculate variances for each pilot and run in NM case:
+# variances_u_NM = []
+# variances_e_NM = []
+# for i in range(5):
+#     variances_u_NM.append([np.var(run) for run in u_NM[i]])
+#     variances_e_NM.append([np.var(run) for run in e_NM[i]])
+
+# # Calculate variances for each pilot and run in M case:
+# variances_u_M = []
+# variances_e_M = []
+# for i in range(5):
+#     variances_u_M.append([np.var(run) for run in u_M[i]])
+#     variances_e_M.append([np.var(run) for run in e_M[i]])
+
+# # Calculate average variances for each run in NM case:
+# average_variances_u_NM = average_variance_per_run(variances_u_NM)
+# average_variances_e_NM = average_variance_per_run(variances_e_NM)
+
+# # Calculate average variances for each run in M case:
+# average_variances_u_M = average_variance_per_run(variances_u_M)
+# average_variances_e_M = average_variance_per_run(variances_e_M)
+
+# print(len(average_variances_e_NM))
+# print(len(average_variances_e_M))
+# print(len(average_variances_u_NM))
+# print(len(average_variances_u_M))
+
+# # Plotting
+# run = [1, 2, 3, 4, 5]
+# plt.subplot(1, 2, 1)
+# plt.ylim(0,27)
+# plt.xlabel("Number of runs (1-5)")
+# plt.ylabel("Average Error Variance")
+# plt.grid()
+# plt.plot(run, e_average_variances_NM, marker="o", label="NM")
+# plt.plot(run, e_average_variances_M, marker="o", label="M")
+
+# plt.legend()
+# plt.subplot(1, 2, 2)
+# plt.ylim(0,27)
+# plt.xlabel("Number of runs (1-5)")
+# plt.ylabel("Average Control Variance")
+# plt.grid()
+# plt.plot(run, u_average_variances_NM, marker="o", label="NM")
+# plt.plot(run, u_average_variances_M, marker="o", label="M")
+# plt.legend()
+# plt.savefig('Variance.png')
+# plt.show()
 
 #Code graveyard down here
 """ ***OLD METHOD***
