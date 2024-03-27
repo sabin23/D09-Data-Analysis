@@ -132,7 +132,6 @@ scatter2 = plt.scatter(combined_data[h_labels == 1, 0], combined_data[h_labels =
                      c='purple', alpha=0.5, label='Cluster 2')
 scatter3 = plt.scatter(combined_data[h_labels == 2, 0], combined_data[h_labels == 2, 1],
                      c='blue', alpha=0.5, label='Cluster 3')
-# plt.scatter(centroids[:, 0], centroids[:, 1], marker='o', s=200, c='red', label='Centroids')
 plt.title('Hierarchical Clustering')
 plt.xlabel('e')
 plt.ylabel('$\dot{x}$')
