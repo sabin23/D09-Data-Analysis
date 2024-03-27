@@ -4,9 +4,9 @@ from get_data import Data
 import matplotlib.pyplot as plt
 
 # Data: subject, condition
-subject = 1
-condition = 1 
-run = 0
+subject = 6
+condition = 3 
+run = 4
 data = Data(subject, condition)
 
 Hpe_data = data.Hpe_FC
@@ -20,34 +20,45 @@ x = np.transpose(x)
 t = data.t[0]
 
 # Coefficients
-K_pe = 0.5
-t_lead = 0.1
-t_lag = 0.1
-tau = 0.1
-omega_nm = 10
-zeta_nm = 0.7
+K_pe = 1         # magnitude of magnitude graph
+t_lead = 0.6     # moves phase graph up
+t_lag = 0.1      # moves phase graph down
+tau = 0.3        # decreases gradient of phase graph
+omega_nm = 10    # location of magnitude peak
+zeta_nm = 0.6    # height of magnitude peak
 
-def H_pe(w):
-    jw = w * 1j
-    return K_pe * (t_lead * jw + 1) / (t_lag * jw + 1) * np.exp(- jw * tau) * H_nm(jw)
+initial_parameters = [1, 0.2, 0.1, 0.45, 13, 0.6]
+parameters = [K_pe, t_lead, t_lag, tau, omega_nm, zeta_nm]
 
-def H_nm(w):
+def H_pe(parameters, w):
     jw = w * 1j
+    K_pe = parameters[0]
+    t_lead = parameters[1]
+    t_lag = parameters[2]
+    tau = parameters[3]
+    omega_nm = parameters[4]
+    zeta_nm = parameters[5]
+    return K_pe * (t_lead * jw + 1) / (t_lag * jw + 1) * np.exp(- jw * tau) * H_nm(parameters, jw)
+
+def H_nm(parameters, w):
+    jw = w
+    K_pe = parameters[0]
+    t_lead = parameters[1]
+    t_lag = parameters[2]
+    tau = parameters[3]
+    omega_nm = parameters[4]
+    zeta_nm = parameters[5]
     return omega_nm ** 2 / (jw ** 2 + 2 * zeta_nm * omega_nm * jw + omega_nm ** 2)
 
-def dfdt (f, t):
-    dfdt = np.zeros(f.shape)
-    for i in range(0, len(f)-1):
-        if i > 0 and i < len(f)-1:
-            dfdt[i] = (f[i+1] - f[i-1]) / (t[i+1] - t[i-1])
-    dfdt[len(f)-1] = dfdt[len(f)-2]
-    dfdt[0] = dfdt[1]
-    return dfdt
+def cost_function(parameters, w):
+    return np.sum(np.sqrt(np.square(np.real(Hpe_data) - np.real(H_pe(parameters, w))) 
+                        + np.square(np.imag(Hpe_data) - np.imag(H_pe(parameters, w)))))
 
-def plot(subject, condition):
-    a, b = subject, condition
+def plot():
     w_FC = data.w_FC
-    response = H_pe(w_FC)
+    response = H_pe(parameters, w_FC)
+    opt_parameters = opt.fmin(cost_function, initial_parameters, args=(w_FC,))
+    opt_response = H_pe(opt_parameters, w_FC)
 
     # Get magnitude and phase of numbers in Hpe_FC
     Hpe_FC = Hpe_data
@@ -66,6 +77,11 @@ def plot(subject, condition):
     hpec_response = np.imag(response)
     magnitude_response = np.sqrt(np.square(hper_response) + np.square(hpec_response))
     phase_response = np.angle(response, deg=True)
+    # Get magnitude and phase of numbers in opt_response
+    hper_opt_response = np.real(opt_response)
+    hpec_opt_response = np.imag(opt_response)
+    magnitude_opt_response = np.sqrt(np.square(hper_opt_response) + np.square(hpec_opt_response))
+    phase_opt_response = np.angle(opt_response, deg=True)
 
     for i in range(len(phase_Hpe)):
         if i != len(phase_Hpe) - 1:
@@ -75,6 +91,8 @@ def plot(subject, condition):
                 phase_Hpxd[i + 1] -= 360
             if abs(phase_response[i] - phase_response[i + 1]) >= 180:
                 phase_response[i + 1] -= 360
+            if abs(phase_opt_response[i] - phase_opt_response[i + 1]) >= 180:
+                phase_opt_response[i + 1] -= 360
 
 
     # Create a figure with two subplots
@@ -83,7 +101,8 @@ def plot(subject, condition):
     # Plot the magnitude of Hpe_FC in the first subplot
     axs[0].semilogx(w_FC, magnitude_Hpe, label='Hpe')
     axs[0].semilogx(w_FC, magnitude_Hpxd, label='Hpxd')
-    axs[0].semilogx(w_FC, magnitude_response, label='Resonse')
+    axs[0].semilogx(w_FC, magnitude_response, label='Initial Guess')
+    axs[0].semilogx(w_FC, magnitude_opt_response, label='Optimized')
     axs[0].set_title('Magnitude of Hpe_FC')
     axs[0].set_xlabel('Frequency (Hz)')
     axs[0].set_ylabel('Magnitude')
@@ -93,7 +112,8 @@ def plot(subject, condition):
     # Plot the phase of Hpe_FC in the second subplot
     axs[1].semilogx(w_FC, phase_Hpe, label='Hpe')
     axs[1].semilogx(w_FC, phase_Hpxd, label='Hpxd')
-    axs[1].semilogx(w_FC, phase_response, label='Response')
+    axs[1].semilogx(w_FC, phase_response, label='Initial Guess')
+    axs[1].semilogx(w_FC, phase_opt_response, label='Optimized')
     axs[1].set_title('Phase of Hpe_FC')
     axs[1].set_xlabel('Frequency (Hz)')
     axs[1].set_ylabel('Phase (degrees)')
@@ -103,12 +123,9 @@ def plot(subject, condition):
     plt.tight_layout()
     plt.show()
 
-#plot(1, 1)
 
-print(x.shape)
-print(t.shape)
+opt_parameters = opt.fmin(cost_function, initial_parameters, args=(w_FC,))
 
+print(opt_parameters)
 
-v = dfdt(x, t)
-
-plot(1, 1)
+plot()
