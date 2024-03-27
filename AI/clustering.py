@@ -134,11 +134,7 @@ scatter1 = plt.scatter(combined_data[h_labels == 0, 0], combined_data[h_labels =
 scatter2 = plt.scatter(combined_data[h_labels == 1, 0], combined_data[h_labels == 1, 1],
                      c='green', alpha=0.5, label='Cluster 2')
 scatter3 = plt.scatter(combined_data[h_labels == 2, 0], combined_data[h_labels == 2, 1],
-<<<<<<< HEAD
                      c='blue', alpha=0.5, label='Cluster 3')
-=======
-                     c='yellow', alpha=0.5, label='Cluster 3')
->>>>>>> AI_1
 plt.title('Hierarchical Clustering')
 plt.xlabel('e')
 plt.ylabel('$\dot{x}$')
