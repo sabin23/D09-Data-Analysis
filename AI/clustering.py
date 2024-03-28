@@ -124,40 +124,40 @@ n_clusters = 3
 
 # ------------------- Agglomerative Clustering ------------------   
 
-hierarchical = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
-hierarchical.fit(combined_data)
-h_labels = hierarchical.labels_
+# hierarchical = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
+# hierarchical.fit(combined_data)
+# h_labels = hierarchical.labels_
 
-# Plot the hierarchical clustering results
-scatter1 = plt.scatter(combined_data[h_labels == 0, 0], combined_data[h_labels == 0, 1],
-                     c='pink', alpha=0.5, label='Cluster 1')
-scatter2 = plt.scatter(combined_data[h_labels == 1, 0], combined_data[h_labels == 1, 1],
-                     c='green', alpha=0.5, label='Cluster 2')
-scatter3 = plt.scatter(combined_data[h_labels == 2, 0], combined_data[h_labels == 2, 1],
-                     c='blue', alpha=0.5, label='Cluster 3')
-plt.title('Hierarchical Clustering')
-plt.xlabel('e')
-plt.ylabel('$\dot{x}$')
-plt.legend()
-plt.show()
-
-# ------------------- Divisive Clustering -------------------
-
-# combined_data, _ = make_blobs(n_samples=100, centers=3, n_features=2, random_state=42)
-
-# divisive = AgglomerativeClustering(n_clusters=n_clusters)
-# divisive.fit(combined_data)
-# d_labels = divisive.labels_
-
-# # Plot the divisive clustering results
-# scatter1 = plt.scatter(combined_data[d_labels == 0, 0], combined_data[d_labels == 0, 1],
-#                      c='green', alpha=0.5, label='Cluster 1')
-# scatter2 = plt.scatter(combined_data[d_labels == 1, 0], combined_data[d_labels == 1, 1],
-#                      c='purple', alpha=0.5, label='Cluster 2')
-# scatter3 = plt.scatter(combined_data[d_labels == 2, 0], combined_data[d_labels == 2, 1],
+# # Plot the hierarchical clustering results
+# scatter1 = plt.scatter(combined_data[h_labels == 0, 0], combined_data[h_labels == 0, 1],
+#                      c='pink', alpha=0.5, label='Cluster 1')
+# scatter2 = plt.scatter(combined_data[h_labels == 1, 0], combined_data[h_labels == 1, 1],
+#                      c='green', alpha=0.5, label='Cluster 2')
+# scatter3 = plt.scatter(combined_data[h_labels == 2, 0], combined_data[h_labels == 2, 1],
 #                      c='blue', alpha=0.5, label='Cluster 3')
-# plt.title('Divisive Clustering')
+# plt.title('Hierarchical Clustering')
 # plt.xlabel('e')
 # plt.ylabel('$\dot{x}$')
 # plt.legend()
 # plt.show()
+
+# ------------------- Divisive Clustering -------------------
+
+combined_data, _ = make_blobs(n_samples=100, centers=3, n_features=2, random_state=42)
+
+divisive = AgglomerativeClustering(n_clusters=n_clusters)
+divisive.fit(combined_data)
+d_labels = divisive.labels_
+
+# Plot the divisive clustering results
+scatter1 = plt.scatter(combined_data[d_labels == 0, 0], combined_data[d_labels == 0, 1],
+                     c='green', alpha=0.5, label='Cluster 1')
+scatter2 = plt.scatter(combined_data[d_labels == 1, 0], combined_data[d_labels == 1, 1],
+                     c='purple', alpha=0.5, label='Cluster 2')
+scatter3 = plt.scatter(combined_data[d_labels == 2, 0], combined_data[d_labels == 2, 1],
+                     c='blue', alpha=0.5, label='Cluster 3')
+plt.title('Divisive Clustering')
+plt.xlabel('e')
+plt.ylabel('$\dot{x}$')
+plt.legend()
+plt.show()
