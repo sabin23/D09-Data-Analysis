@@ -4,9 +4,9 @@ from get_data import Data
 import matplotlib.pyplot as plt
 
 # Data: subject, condition
-subject = 6
-condition = 3 
-run = 4
+subject = 1
+condition = 3
+run = 2
 data = Data(subject, condition)
 
 Hpe_data = data.Hpe_FC

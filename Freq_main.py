@@ -21,7 +21,7 @@ def plot_and_save(subject, trial):
     # Compute the FFT of both signals
     fft_result_ft = np.fft.fft(ft[:, 0])
     fft_result_u = np.fft.fft(u[:, 0])
-
+    print(fft_result_ft)
     # Assuming uniform time sampling, compute the frequency axis
     dt = t[0, 1] - t[0, 0]
     N = len(ft)  # or len(u), assuming both have the same length
