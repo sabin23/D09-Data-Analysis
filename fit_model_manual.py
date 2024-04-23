@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Data: subject, condition
 subject = 1
-condition = 3
+condition = 5
 run = 2
 data = Data(subject, condition)
 
@@ -30,6 +30,12 @@ zeta_nm = 0.6    # height of magnitude peak
 initial_parameters = [1, 0.2, 0.1, 0.45, 13, 0.6]
 parameters = [K_pe, t_lead, t_lag, tau, omega_nm, zeta_nm]
 
+"""
+- Boxplots for parameters in no motion case
+- New fits for motion model (conditions 4-6)
+- Boxplots for total model (4-6)
+"""
+
 def H_pe(parameters, w):
     jw = w * 1j
     K_pe = parameters[0]
@@ -50,14 +56,15 @@ def H_nm(parameters, w):
     zeta_nm = parameters[5]
     return omega_nm ** 2 / (jw ** 2 + 2 * zeta_nm * omega_nm * jw + omega_nm ** 2)
 
-def cost_function(parameters, w):
-    return np.sum(np.sqrt(np.square(np.real(Hpe_data) - np.real(H_pe(parameters, w))) 
+def cost_function_hpe(parameters, w, Hpe_data):
+    cost = np.sum(np.sqrt(np.square(np.real(Hpe_data) - np.real(H_pe(parameters, w))) 
                         + np.square(np.imag(Hpe_data) - np.imag(H_pe(parameters, w)))))
+    return cost
 
 def plot():
     w_FC = data.w_FC
     response = H_pe(parameters, w_FC)
-    opt_parameters = opt.fmin(cost_function, initial_parameters, args=(w_FC,))
+    opt_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
     opt_response = H_pe(opt_parameters, w_FC)
 
     # Get magnitude and phase of numbers in Hpe_FC
@@ -124,8 +131,53 @@ def plot():
     plt.show()
 
 
-opt_parameters = opt.fmin(cost_function, initial_parameters, args=(w_FC,))
+#opt_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
 
-print(opt_parameters)
+#print(opt_parameters)
 
-plot()
+#plot()
+
+def boxplots_hpe():
+    K_pe_arr = [[], [], [], [], [], []]
+    t_lead_arr = [[], [], [], [], [], []]
+    t_lag_arr = [[], [], [], [], [], []]
+    tau_arr = [[], [], [], [], [], []]
+    omega_nm_arr = [[], [], [], [], [], []]
+    zeta_nm_arr = [[], [], [], [], [], []]
+    
+    for condition in range(6):
+        for subject in range(6):
+            data = Data(subject + 1, condition + 1)
+            Hpe_data = data.Hpe_FC
+            w_FC = data.w_FC
+            optimized_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
+            K_pe_arr[condition].append(optimized_parameters[0])
+            t_lead_arr[condition].append(optimized_parameters[1])
+            t_lag_arr[condition].append(optimized_parameters[2])
+            tau_arr[condition].append(optimized_parameters[3])
+            omega_nm_arr[condition].append(optimized_parameters[4])
+            zeta_nm_arr[condition].append(optimized_parameters[5])
+
+
+    # make 6 plots, 1 for each parameter, with 6 boxplots, 1 for each condition
+    fig, axs = plt.subplots(2, 3)
+    fig.suptitle('Optimized Parameters for Hpe')
+    axs[0, 0].boxplot(K_pe_arr, showfliers=False)
+    axs[0, 0].set_title('K_pe')
+    axs[0, 1].boxplot(t_lead_arr, showfliers=False)
+    axs[0, 1].set_title('t_lead')
+    axs[0, 2].boxplot(t_lag_arr, showfliers=False)
+    axs[0, 2].set_title('t_lag')
+    axs[1, 0].boxplot(tau_arr, showfliers=False)
+    axs[1, 0].set_title('tau')
+    axs[1, 1].boxplot(omega_nm_arr, showfliers=False)
+    axs[1, 1].set_title('omega_nm')
+    axs[1, 2].boxplot(zeta_nm_arr, showfliers=False)
+    axs[1, 2].set_title('zeta_nm')
+    print(omega_nm_arr)
+    print(zeta_nm_arr)
+    
+    plt.show()
+
+boxplots_hpe()
+
