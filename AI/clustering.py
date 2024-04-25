@@ -4,31 +4,36 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
-# from skfda import datasets
-# from skfda.exploratory.visualization.clustering import (
-#     ClusterMembershipLinesPlot,
-#     ClusterMembershipPlot,
-#     ClusterPlot,
-# )
-# from skfda.ml.clustering import FuzzyCMeans, KMeans
 
 # Add the parent directory to sys.path
 sys.path.append("..")
 
 from get_data import Data
 
-data = Data(2, 5)
+# nm -> no motion; m -> motion; (pilot, test)
+data_nm = Data(3, 5)
+data_m = Data(3, 6)
 
-e = data.e
-x = data.x
-u = data.u
-t = data.t
+e_nm = data_nm.e
+e_m = data_m.e
 
-rms = np.sqrt(np.mean(e**2))
+x_nm = data_nm.x
+x_m = data_m.x
 
-e = np.mean(e, axis=1)[:, np.newaxis]
-x = np.mean(x, axis=1)[:, np.newaxis]
-u = np.mean(u, axis=1)[:, np.newaxis]
+u_nm = data_nm.u
+u_m = data_m.u
+
+t = data_nm.t
+
+def rms(f):
+    return np.sqrt((np.mean(f, axis=0))**2).reshape(-1, 1)
+
+rms_e_nm = rms(e_nm)
+rms_e_m = rms(e_m)
+
+rms_u_nm = rms(u_nm)
+rms_u_m =  rms(u_m)
+
 t = t.reshape(-1, 1)
 
 def dfdt (f, t):
@@ -40,184 +45,94 @@ def dfdt (f, t):
     dfdt[0] = dfdt[1]
     return dfdt
 
-xdot = dfdt(x, t)
+edot_nm = dfdt(e_nm, t)
+edot_m = dfdt(e_m, t)
 
-xdot = np.mean(xdot, axis=1)[:, np.newaxis]
+udot_nm = dfdt(u_nm, t)
+udot_m = dfdt(u_m, t)
 
-# ------------------- Elbow method -------------------
-# distortions = []
-# K = range(1, 11)
-# for k in K:
-#     kmeans = KMeans(n_clusters=k)
-#     kmeans.fit(np.concatenate((e, xdot), axis=1))
-#     distortions.append(kmeans.inertia_)
+def mean(f):
+    return np.mean(f, axis=1).reshape(-1, 1)
 
-# # Find the elbow point
-# rate_of_change = [abs(distortions[i] - distortions[i-1]) for i in range(1, len(distortions))]
+e_nm = mean(e_nm)
+e_m = mean(e_m)
 
-# elbow_index = rate_of_change.index(max(rate_of_change)) + 1
+u_nm = mean(u_nm)
+u_m = mean(u_m)
 
-# optimal_k = K[elbow_index]
 
-# print("Optimal number of clusters:", optimal_k)
-# print("Rate of change:", rate_of_change)
+rms_edot_nm = rms(edot_nm)
+rms_edot_m = rms(edot_m)
 
-# # Plot the elbow curve
-# plt.plot(K, distortions, 'bx-')
-# plt.xlabel('Number of Clusters (k)')
-# plt.ylabel('Distortion')
-# plt.title('Elbow Method')
-# plt.show()
+rms_udot_nm = rms(udot_nm)
+rms_udot_m = rms(udot_m)
 
-# 2D combined data
-combined_data = np.concatenate((e, xdot), axis=1)
-# 3D combined data
-# combined_data = np.concatenate((e, xdot, u), axis=1)
+
+edot_nm = mean(edot_nm)
+edot_m = mean(edot_m)
+
+udot_nm = mean(udot_nm)
+udot_m = mean(udot_m)
+
+
+dict_e = {'rms_e_nm': rms_e_nm, 'rms_e_m': rms_e_m, 'rms_edot_nm': rms_edot_nm, 'rms_edot_m': rms_edot_m}
+dict_u = {'rms_u_nm': rms_u_nm, 'rms_u_m': rms_u_m, 'rms_udot_nm': rms_udot_nm, 'rms_udot_m': rms_udot_m}
+
+# ------------------- rms --------------------
+cluster_e = np.concatenate((rms_e_nm, rms_e_m), axis=1).reshape(-1, 1)
+cluster_edot = np.concatenate((rms_edot_nm, rms_edot_m), axis=1).reshape(-1, 1)
+
+cluster_u = np.concatenate((rms_u_nm, rms_u_m), axis=1).reshape(-1, 1)
+cluster_udot = np.concatenate((rms_udot_nm, rms_udot_m), axis=1).reshape(-1, 1)
+
+# ------------------- non-rms ----------------
+# cluster_e = np.concatenate((e_nm, e_m), axis=1).reshape(-1, 1)
+# cluster_edot = np.concatenate((edot_nm, edot_m), axis=1).reshape(-1, 1)
+
+# cluster_u = np.concatenate((u_nm, u_m), axis=1).reshape(-1, 1)
+# cluster_udot = np.concatenate((udot_nm, udot_m), axis=1).reshape(-1, 1)
+
+# ------------------- K-means -------------------
+combined_data = np.concatenate((cluster_e, cluster_edot, cluster_u), axis=1)
 
 n_clusters = 2
 
-# ------------------- Using AI Course -------------------
-
-def train(train_dict, data_dict, n_clusters):
-    X_train = []
-    for i in range(len(train_dict)):
-        X_train.extend(data_dict[f'a{i + 1}']['strains'])
-
-    X_train = np.array(X_train).squeeze().reshape(-1, 1)
-
-    X_train = np.sort(X_train.reshape(-1))
-
-    cluster_model = Kmeans(n_clusters=n_clusters, n_init=10).fit(X_train.reshape(-1, 1))
-
-    _, indx = np.unique(cluster_model.labels_, return_index=True)
-    lookup_labels = [cluster_model.labels_[i] for i in sorted(indx)]
-
-    return cluster_model, lookup_labels
-
-def predict(cluster_model, lookup_labels, data_dict, cluster_method, train):
-    if train:
-        clusters_dict = {f'a{i + 1}': [] for i in range(len(6))}
-    else:
-        clusters_dict = {f'a{i + 1}': [] for i in range(len(2))}
-
-    for i in range(len(data_dict)):
-        if train:
-            pred = cluster_model.predict(
-                np.array(data_dict[f'a{i + 1}']['strains']).squeeze().reshape(-1, 1))
-        else:
-            pred = cluster_model.predict(
-                np.array(data_dict[f'te_a{i + 1}']['strains']).squeeze().reshape(-1, 1))
-        labels = []
-        for j in range(len(pred)):
-            labels.append(np.where(lookup_labels == pred[j])[0])
-        if train:
-            clusters_dict[f'a{i + 1}'].extend(sorted(labels))
-        else:
-            clusters_dict[f'te_a{i + 1}'].extend(sorted(labels))
-    
-    return clusters_dict
-
-train_dict = e
-test_dict = e
-
-data_dict = {}
-data_dict.update(train_dict)
-data_dict.update(test_dict)
-
-cluster_model, lookup_labels = train(data.data_dict, data.data_dict, n_clusters)
-
-train_labels_dict = predict(cluster_model, lookup_labels, train_dict, train=True)
-test_labels_dict = predict(cluster_model, lookup_labels, test_dict, train=False)
-
-# ------------------- K-means -------------------
-
-kmeans = KMeans(n_clusters = n_clusters)
+kmeans = KMeans(n_clusters=n_clusters, random_state=0)
 kmeans.fit(combined_data)
 centroids = kmeans.cluster_centers_
 labels = kmeans.labels_
+inertia = kmeans.inertia_
+score = kmeans.score(combined_data)
 
 centroids_diff = np.linalg.norm(centroids[0] - centroids[1])
 
 print("Scalar difference between centroids:", centroids_diff)
-print("RMS e:", rms)
 
-# ------------------- 3D K-means -------------------
+print("Lables:", labels)
 
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
+print("Inertia:", inertia)
 
-# scatter1 = ax.scatter(combined_data[labels == 0, 0], combined_data[labels == 0, 1], combined_data[labels == 0, 2], 
-#                      c='yellow', alpha=0.5, label='Cluster 1')
-# scatter2 = ax.scatter(combined_data[labels == 1, 0], combined_data[labels == 1, 1], combined_data[labels == 1, 2], 
-#                      c='purple', alpha=0.5, label='Cluster 2')
+print("Score:", score)
 
-# centroid1 = ax.scatter(centroids[0, 0], centroids[0, 1], centroids[0, 2], marker='o', s=200, c='red', label='Centroid 1')
-# centroid2 = ax.scatter(centroids[1, 0], centroids[1, 1], centroids[1, 2], marker='o', s=200, c='blue', label='Centroid 2')
+# ------------------- 3D K-means Plot -------------------
 
-# # Show legend
-# plt.legend(handles=[scatter1, scatter2, centroid1, centroid2])
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
 
-# ax.set_xlabel('e')
-# ax.set_ylabel('xdot')
-# ax.set_zlabel('u')
-# ax.set_title('K-means Clustering')
-# plt.legend()
-# plt.show()
+scatter1 = ax.scatter(combined_data[labels == 0, 0], combined_data[labels == 0, 1], combined_data[labels == 0, 2], 
+                     c='red', alpha=0.5, label='Cluster 1')
+scatter2 = ax.scatter(combined_data[labels == 1, 0], combined_data[labels == 1, 1], combined_data[labels == 1, 2], 
+                     c='blue', alpha=0.5, label='Cluster 2')
 
-# ------------------- 2D K-means -------------------
+centroid1 = ax.scatter(centroids[0, 0], centroids[0, 1], centroids[0, 2], marker='o', s=200, c='red', label='Centroid 1')
+centroid2 = ax.scatter(centroids[1, 0], centroids[1, 1], centroids[1, 2], marker='o', s=200, c='blue', label='Centroid 2')
 
-scatter1 = plt.scatter(combined_data[labels == 0, 0], combined_data[labels == 0, 1],
-                     c='green', alpha=0.5, label='Cluster 1')
-scatter2 = plt.scatter(combined_data[labels == 1, 0], combined_data[labels == 1, 1],
-                     c='purple', alpha=0.5, label='Cluster 2')
-scatter3 = plt.scatter(combined_data[labels == 2, 0], combined_data[labels == 2, 1],
-                     c='blue', alpha=0.5, label='Cluster 3')
-plt.scatter(centroids[:, 0], centroids[:, 1], marker='o', s=200, c='red', label='Centroids')
-plt.title('K-means Clustering')
-plt.xlabel('e')
-plt.ylabel('$\dot{x}$')
+# Show legend
+plt.legend(handles=[scatter1, scatter2, centroid1, centroid2])
+
+ax.set_xlabel('e')
+ax.set_ylabel('e_dot')
+ax.set_zlabel('u')
+ax.set_title('K-means Clustering')
 plt.legend()
 plt.show()
-
-
-# ------------------- Hierarchical Clustering -------------------
-
-# ------------------- Agglomerative Clustering ------------------   
-
-# hierarchical = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
-# hierarchical.fit(combined_data)
-# h_labels = hierarchical.labels_
-
-# # Plot the hierarchical clustering results
-# scatter1 = plt.scatter(combined_data[h_labels == 0, 0], combined_data[h_labels == 0, 1],
-#                      c='pink', alpha=0.5, label='Cluster 1')
-# scatter2 = plt.scatter(combined_data[h_labels == 1, 0], combined_data[h_labels == 1, 1],
-#                      c='green', alpha=0.5, label='Cluster 2')
-# scatter3 = plt.scatter(combined_data[h_labels == 2, 0], combined_data[h_labels == 2, 1],
-#                      c='blue', alpha=0.5, label='Cluster 3')
-# plt.title('Hierarchical Clustering')
-# plt.xlabel('e')
-# plt.ylabel('$\dot{x}$')
-# plt.legend()
-# plt.show()
-
-# ------------------- Divisive Clustering -------------------
-
-# combined_data, _ = make_blobs(n_samples=100, centers=3, n_features=2, random_state=42)
-
-# divisive = AgglomerativeClustering(n_clusters=n_clusters)
-# divisive.fit(combined_data)
-# d_labels = divisive.labels_
-
-# # Plot the divisive clustering results
-# scatter1 = plt.scatter(combined_data[d_labels == 0, 0], combined_data[d_labels == 0, 1],
-#                      c='green', alpha=0.5, label='Cluster 1')
-# scatter2 = plt.scatter(combined_data[d_labels == 1, 0], combined_data[d_labels == 1, 1],
-#                      c='purple', alpha=0.5, label='Cluster 2')
-# scatter3 = plt.scatter(combined_data[d_labels == 2, 0], combined_data[d_labels == 2, 1],
-#                      c='blue', alpha=0.5, label='Cluster 3')
-# plt.title('Divisive Clustering')
-# plt.xlabel('e')
-# plt.ylabel('$\dot{x}$')
-# plt.legend()
-# plt.show()
