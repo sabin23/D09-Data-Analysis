@@ -26,11 +26,12 @@ def H_nm(parameters, w):
     jw = w
     omega_nm = parameters[1]
     zeta_nm = parameters[2]
+    
     return omega_nm ** 2 / (jw ** 2 + 2 * zeta_nm * omega_nm * jw + omega_nm ** 2)
 
 def cost_function_pm(parameters, w, Hpm_data, Hpxd_data):
-    cost = np.sum(np.sqrt(np.square(np.real(Hpm_data) - np.real(H_pm(parameters, w))) + np.square(np.imag(Hpm_data) - np.imag(H_pm(parameters, w)))))
-    cost += np.sum(np.sqrt(np.square(np.real(Hpxd_data) - np.real(H_scc(parameters, w))) + np.square(np.imag(Hpxd_data) - np.imag(H_scc(parameters, w)))))
+    cost = np.sum(np.sqrt(np.abs(np.square(np.real(Hpm_data) - np.real(H_pm(parameters, w))) + np.square(np.imag(Hpm_data) - np.imag(H_pm(parameters, w))))))
+    cost += np.sum(np.sqrt(np.abs(np.square(np.real(Hpxd_data) - np.real(H_scc(parameters, w))) + np.square(np.imag(Hpxd_data) - np.imag(H_scc(parameters, w))))))
     return cost
 
 def boxplots_hpxd():
@@ -38,6 +39,8 @@ def boxplots_hpxd():
     omega_nm_arr = [[], [], []]
     zeta_nm_arr = [[], [], []]
     tau_m_arr = [[], [], []]
+    Hpe_arr = [[], [], []]
+    Hpxd_arr = [[], [], []]
 
     for condition in range(3, 6):
         for subject in range(6):
@@ -50,6 +53,8 @@ def boxplots_hpxd():
             omega_nm_arr[condition - 3].append(optimized_parameters[1])
             zeta_nm_arr[condition - 3].append(optimized_parameters[2])
             tau_m_arr[condition - 3].append(optimized_parameters[3])
+            Hpe_arr[condition - 3].append(H_pe_data)
+            Hpxd_arr[condition - 3].append(H_pxd_data)
 
     # make 4 plots, 1 for each parameter, with 3 boxplots, 1 for each condition
     plt.figure(1)
@@ -65,6 +70,11 @@ def boxplots_hpxd():
     plt.subplot(224)
     plt.boxplot(tau_m_arr, showfliers=False)
     plt.title('tau_m')
+
+   
     plt.show()
 
+
+
 boxplots_hpxd()
+

@@ -4,9 +4,9 @@ from get_data import Data
 import matplotlib.pyplot as plt
 
 # Data: subject, condition
-subject = 1
-condition = 5
-run = 2
+subject = 6
+condition = 6
+run = 4
 data = Data(subject, condition)
 
 Hpe_data = data.Hpe_FC
@@ -20,15 +20,22 @@ x = np.transpose(x)
 t = data.t[0]
 
 # Coefficients
-K_pe = 1         # magnitude of magnitude graph
-t_lead = 0.6     # moves phase graph up
+K_pe = 1.0       # magnitude of magnitude graph
+t_lead = 1.0     # moves phase graph up
 t_lag = 0.1      # moves phase graph down
-tau = 0.3        # decreases gradient of phase graph
+tau = 0.25       # decreases gradient of phase graph
 omega_nm = 10    # location of magnitude peak
 zeta_nm = 0.6    # height of magnitude peak
+K_m = 0.01
+tau_m = 0.12
 
-initial_parameters = [1, 0.2, 0.1, 0.45, 13, 0.6]
-parameters = [K_pe, t_lead, t_lag, tau, omega_nm, zeta_nm]
+initial_parameters = []
+initial_parameters.append([1., 0.1, 1., 0.25, 8., 0.6, 0.2, 0.15])        # Position
+initial_parameters.append([0.45, 0.1, 0.1, 0.25, 10., 0.6, 0.55, 0.7])    # Velocity
+initial_parameters.append([0.55, 1.0, 0.1, 0.25, 10., 0.6, 0.45, 0.12])   # Acceleration
+
+vehicle = condition - 4
+parameters = initial_parameters[vehicle]
 
 """
 - Boxplots for parameters in no motion case
@@ -42,30 +49,49 @@ def H_pe(parameters, w):
     t_lead = parameters[1]
     t_lag = parameters[2]
     tau = parameters[3]
-    omega_nm = parameters[4]
-    zeta_nm = parameters[5]
     return K_pe * (t_lead * jw + 1) / (t_lag * jw + 1) * np.exp(- jw * tau) * H_nm(parameters, jw)
 
 def H_nm(parameters, w):
     jw = w
-    K_pe = parameters[0]
-    t_lead = parameters[1]
-    t_lag = parameters[2]
-    tau = parameters[3]
     omega_nm = parameters[4]
     zeta_nm = parameters[5]
     return omega_nm ** 2 / (jw ** 2 + 2 * zeta_nm * omega_nm * jw + omega_nm ** 2)
 
-def cost_function_hpe(parameters, w, Hpe_data):
-    cost = np.sum(np.sqrt(np.square(np.real(Hpe_data) - np.real(H_pe(parameters, w))) 
-                        + np.square(np.imag(Hpe_data) - np.imag(H_pe(parameters, w)))))
+def H_scc(parameters, w):
+    return (0.11 * w + 1) / (5.9 * w + 1)
+
+def H_pxd(parameters, w):
+    jw = w * 1j
+    K_m = parameters[6]
+    tau_m = parameters[7]
+    return jw * H_scc(parameters, jw) * K_m * np.exp(-jw * tau_m) * H_nm(parameters, jw)
+
+def cost_function_pm(parameters, w, Hpe_data, Hpxd_data):
+    Hpe_error = np.abs(Hpe_data - H_pe(parameters, w)) / np.abs(Hpe_data)
+    Hpxd_error = np.abs(Hpxd_data - H_pxd(parameters, w)) / np.abs(Hpxd_data)
+
+    cost = np.sum(Hpe_error)
+    cost += np.sum(Hpxd_error)
+
+    # cost = np.sum(np.abs(Hpxd_data - H_pxd(parameters, w)))
+    # cost += np.sum(np.abs(Hpe_data - H_pe(parameters, w)))
+
+    if parameters[0] < 0 or parameters[1] < 0 or parameters[2] < 0 or parameters[3] < 0 or parameters[4] < 0 or parameters[5] < 0 or parameters[6] < 0 or parameters[7] < 0:
+        cost += 1000000
+    # print(cost)
     return cost
+
 
 def plot():
     w_FC = data.w_FC
-    response = H_pe(parameters, w_FC)
-    opt_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
-    opt_response = H_pe(opt_parameters, w_FC)
+    response_visual = H_pe(parameters, w_FC)
+    resonse_motion = H_pxd(parameters, w_FC)
+
+    opt_parameters = opt.fmin(cost_function_pm, initial_parameters[vehicle], args=(w_FC, Hpe_data, Hpxd_data))
+    opt_response_hpe = H_pe(opt_parameters, w_FC)
+    opt_response_hpxd = H_pxd(opt_parameters, w_FC)
+    opt_response = opt_response_hpe + opt_response_hpxd
+
 
     # Get magnitude and phase of numbers in Hpe_FC
     Hpe_FC = Hpe_data
@@ -80,15 +106,28 @@ def plot():
     magnitude_Hpxd = np.sqrt(np.square(hpxdr) + np.square(hpxdc))
     phase_Hpxd = np.angle(Hpxd_FC, deg=True)
     # Get magnitude and phase of numbers in response
-    hper_response = np.real(response)
-    hpec_response = np.imag(response)
+    hper_response = np.real(response_visual)
+    hpec_response = np.imag(response_visual)
     magnitude_response = np.sqrt(np.square(hper_response) + np.square(hpec_response))
-    phase_response = np.angle(response, deg=True)
+    phase_response = np.angle(response_visual, deg=True)
     # Get magnitude and phase of numbers in opt_response
     hper_opt_response = np.real(opt_response)
     hpec_opt_response = np.imag(opt_response)
     magnitude_opt_response = np.sqrt(np.square(hper_opt_response) + np.square(hpec_opt_response))
     phase_opt_response = np.angle(opt_response, deg=True)
+    # Get magnitude and phase of numbers in opt_response_hpe
+    hper_opt_response_hpe = np.real(opt_response_hpe)
+    hpec_opt_response_hpe = np.imag(opt_response_hpe)
+    magnitude_opt_response_hpe = np.sqrt(np.square(hper_opt_response_hpe) + np.square(hpec_opt_response_hpe))
+    phase_opt_response_hpe = np.angle(opt_response_hpe, deg=True)
+    # Get magnitude and phase of numbers in opt_response_hpxd
+    hper_opt_response_hpxd = np.real(opt_response_hpxd)
+    hpec_opt_response_hpxd = np.imag(opt_response_hpxd)
+    magnitude_opt_response_hpxd = np.abs(opt_response_hpxd)
+    print(magnitude_opt_response_hpxd)
+    phase_opt_response_hpxd = np.angle(opt_response_hpxd, deg=True)
+
+    print(opt_parameters)
 
     for i in range(len(phase_Hpe)):
         if i != len(phase_Hpe) - 1:
@@ -100,16 +139,22 @@ def plot():
                 phase_response[i + 1] -= 360
             if abs(phase_opt_response[i] - phase_opt_response[i + 1]) >= 180:
                 phase_opt_response[i + 1] -= 360
+            if abs(phase_opt_response_hpe[i] - phase_opt_response_hpe[i + 1]) >= 180:
+                phase_opt_response_hpe[i + 1] -= 360
+            if abs(phase_opt_response_hpxd[i] - phase_opt_response_hpxd[i + 1]) >= 180:
+                phase_opt_response_hpxd[i + 1] -= 360
 
 
     # Create a figure with two subplots
     fig, axs = plt.subplots(2)
 
     # Plot the magnitude of Hpe_FC in the first subplot
-    axs[0].semilogx(w_FC, magnitude_Hpe, label='Hpe')
-    axs[0].semilogx(w_FC, magnitude_Hpxd, label='Hpxd')
-    axs[0].semilogx(w_FC, magnitude_response, label='Initial Guess')
-    axs[0].semilogx(w_FC, magnitude_opt_response, label='Optimized')
+    axs[0].loglog(w_FC, magnitude_Hpe, label='Hpe')
+    axs[0].loglog(w_FC, magnitude_Hpxd, label='Hpxd')
+    axs[0].loglog(w_FC, magnitude_response, label='Initial Guess')
+    axs[0].loglog(w_FC, magnitude_opt_response, label='Optimized')
+    axs[0].loglog(w_FC, magnitude_opt_response_hpe, label='Optimized Hpe')
+    axs[0].loglog(w_FC, magnitude_opt_response_hpxd, label='Optimized Hpxd')
     axs[0].set_title('Magnitude of Hpe_FC')
     axs[0].set_xlabel('Frequency (Hz)')
     axs[0].set_ylabel('Magnitude')
@@ -121,6 +166,8 @@ def plot():
     axs[1].semilogx(w_FC, phase_Hpxd, label='Hpxd')
     axs[1].semilogx(w_FC, phase_response, label='Initial Guess')
     axs[1].semilogx(w_FC, phase_opt_response, label='Optimized')
+    axs[1].semilogx(w_FC, phase_opt_response_hpe, label='Optimized Hpe')
+    axs[1].semilogx(w_FC, phase_opt_response_hpxd, label='Optimized Hpxd')
     axs[1].set_title('Phase of Hpe_FC')
     axs[1].set_xlabel('Frequency (Hz)')
     axs[1].set_ylabel('Phase (degrees)')
@@ -130,53 +177,59 @@ def plot():
     plt.tight_layout()
     plt.show()
 
-
-#opt_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
-
-#print(opt_parameters)
-
-#plot()
+plot()
 
 def boxplots_hpe():
-    K_pe_arr = [[], [], [], [], [], []]
-    t_lead_arr = [[], [], [], [], [], []]
-    t_lag_arr = [[], [], [], [], [], []]
-    tau_arr = [[], [], [], [], [], []]
-    omega_nm_arr = [[], [], [], [], [], []]
-    zeta_nm_arr = [[], [], [], [], [], []]
+    K_pe_arr = [[], [], []]
+    t_lead_arr = [[], [], []]
+    t_lag_arr = [[], [], []]
+    tau_arr = [[], [], []]
+    omega_nm_arr = [[], [], []]
+    zeta_nm_arr = [[], [], []]
+    K_m_arr = [[], [], []]
+    tau_m_arr = [[], [], []]
     
-    for condition in range(6):
+    for condition in range(3, 6):
         for subject in range(6):
             data = Data(subject + 1, condition + 1)
             Hpe_data = data.Hpe_FC
+            Hpxd_data = data.Hpxd_FC
             w_FC = data.w_FC
-            optimized_parameters = opt.fmin(cost_function_hpe, initial_parameters, args=(w_FC, Hpe_data,))
+            """
+            Change vehicle initial conditions here
+            """
+            optimized_parameters = opt.fmin(cost_function_pm, initial_parameters[vehicle], args=(w_FC, Hpe_data, Hpxd_data))
+            """
+            """
             K_pe_arr[condition].append(optimized_parameters[0])
             t_lead_arr[condition].append(optimized_parameters[1])
             t_lag_arr[condition].append(optimized_parameters[2])
             tau_arr[condition].append(optimized_parameters[3])
             omega_nm_arr[condition].append(optimized_parameters[4])
             zeta_nm_arr[condition].append(optimized_parameters[5])
+            K_m_arr[condition].append(optimized_parameters[6])
+            tau_m_arr[condition].append(optimized_parameters[7])
 
 
-    # make 6 plots, 1 for each parameter, with 6 boxplots, 1 for each condition
-    fig, axs = plt.subplots(2, 3)
-    fig.suptitle('Optimized Parameters for Hpe')
+    # make 8 plots, 1 for each parameter, with 3 boxplots, 1 for each condition
+    fig, axs = plt.subplots(2, 4)
     axs[0, 0].boxplot(K_pe_arr, showfliers=False)
     axs[0, 0].set_title('K_pe')
     axs[0, 1].boxplot(t_lead_arr, showfliers=False)
     axs[0, 1].set_title('t_lead')
     axs[0, 2].boxplot(t_lag_arr, showfliers=False)
     axs[0, 2].set_title('t_lag')
-    axs[1, 0].boxplot(tau_arr, showfliers=False)
-    axs[1, 0].set_title('tau')
-    axs[1, 1].boxplot(omega_nm_arr, showfliers=False)
-    axs[1, 1].set_title('omega_nm')
-    axs[1, 2].boxplot(zeta_nm_arr, showfliers=False)
-    axs[1, 2].set_title('zeta_nm')
-    print(omega_nm_arr)
-    print(zeta_nm_arr)
-    
+    axs[0, 3].boxplot(tau_arr, showfliers=False)
+    axs[0, 3].set_title('tau')
+    axs[1, 0].boxplot(omega_nm_arr, showfliers=False)
+    axs[1, 0].set_title('omega_nm')
+    axs[1, 1].boxplot(zeta_nm_arr, showfliers=False)
+    axs[1, 1].set_title('zeta_nm')
+    axs[1, 2].boxplot(K_m_arr, showfliers=False)
+    axs[1, 2].set_title('K_m')
+    axs[1, 3].boxplot(tau_m_arr, showfliers=False)
+    axs[1, 3].set_title('tau_m')
+
     plt.show()
 
 boxplots_hpe()
