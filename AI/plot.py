@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-position = Data(3, 3)
-velocity = Data(3, 4)
+position = Data(3, 1)
+velocity = Data(3, 2)
 
 u_pos = position.u
 e_pos = position.e
@@ -20,6 +20,8 @@ t_pos = np.transpose(np.array(position.t))
 u_vel = velocity.u
 e_vel = velocity.e
 t_vel = np.transpose(np.array(velocity.t))
+
+slices = 1024
 
 
 def get_rms(data):
@@ -45,11 +47,11 @@ rms_e_pos_dot = np.sqrt(np.mean(e_pos**2, axis=1))
 rms_e_dot_pos = get_dot(rms_e_pos_dot, t_pos)
 
 
-rms_slices_u_pos = rms_slices(u_pos, 32)
-rms_slices_e_pos = rms_slices(e_pos, 32)
-rms_slices_t_pos = rms_slices(t_pos, 32)
+rms_slices_u_pos = rms_slices(u_pos, slices)
+rms_slices_e_pos = rms_slices(e_pos, slices)
+rms_slices_t_pos = rms_slices(t_pos, slices)
 
-rms_slices_e_dot_pos = rms_slices(rms_e_dot_pos, 32)
+rms_slices_e_dot_pos = rms_slices(rms_e_dot_pos, slices)
 
 rms_u_vel = get_rms(u_vel)
 rms_e_vel = get_rms(e_vel)
@@ -58,10 +60,10 @@ rms_e_vel_dot = np.sqrt(np.mean(e_vel**2, axis=1))
 
 rms_e_dot_vel = get_dot(rms_e_vel_dot, t_vel)
 
-rms_slices_e_dot_vel = rms_slices(rms_e_dot_vel, 32)
-rms_slices_u_vel = rms_slices(u_vel, 32)
-rms_slices_e_vel = rms_slices(e_vel, 32)
-rms_slices_t_vel = rms_slices(t_vel, 32)
+rms_slices_e_dot_vel = rms_slices(rms_e_dot_vel, slices)
+rms_slices_u_vel = rms_slices(u_vel, slices)
+rms_slices_e_vel = rms_slices(e_vel, slices)
+rms_slices_t_vel = rms_slices(t_vel, slices)
 
 
 plt.subplot(3, 2, 1)
