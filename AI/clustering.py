@@ -9,8 +9,8 @@ sys.path.append("..")
 from get_data import Data
 
 # nm -> no motion; m -> motion; (pilot, test)
-data_nm = Data(3, 3)
-data_m = Data(3, 4)
+data_nm = Data(4, 3)
+data_m = Data(4, 4)
 
 e_nm = data_nm.e
 e_m = data_m.e
@@ -78,6 +78,10 @@ def rms_slices(f, n):
     slices = np.split(f, n)
     return np.array([np.sqrt(np.mean(slice**2)) for slice in slices])
 
+inertia_list = []
+number_of_slices_list = []
+inertia_per_slice_list = []
+percentage_diff_list = []
 
 for i in range(1, 14):
     if 8192 % (pow(2, i)) != 0:
@@ -98,11 +102,11 @@ for i in range(1, 14):
     dict_u = {'rms_u_nm': rms_u_nm, 'rms_u_m': rms_u_m, 'rms_udot_nm': rms_udot_nm, 'rms_udot_m': rms_udot_m}
 
     # ------------------- 2 sets of data --------------------
-    cluster_e = np.concatenate((slices_e_nm, slices_e_m), axis=1).reshape(-1, 1)
-    cluster_edot = np.concatenate((slices_edot_nm, slices_edot_m), axis=1).reshape(-1, 1)
+    cluster_e = np.concatenate((slices_e_nm, slices_e_m), axis=0)
+    cluster_edot = np.concatenate((slices_edot_nm, slices_edot_m), axis=0)
 
-    cluster_u = np.concatenate((slices_u_nm, slices_u_m), axis=1).reshape(-1, 1)
-    cluster_udot = np.concatenate((slices_udot_nm, slices_udot_m), axis=1).reshape(-1, 1)
+    cluster_u = np.concatenate((slices_u_nm, slices_u_m), axis=0)
+    cluster_udot = np.concatenate((slices_udot_nm, slices_udot_m), axis=0)
 
     combined_data_with_labels = np.concatenate((np.zeros((pow(2, i), 1)), np.ones((pow(2, i), 1))), axis=0)
 
@@ -116,7 +120,7 @@ for i in range(1, 14):
     # combined_data_with_labels = np.concatenate((np.zeros((pow(2, i-1), 1)), np.ones((pow(2, i-1), 1))), axis=0)
 
     # ------------------- K-means -------------------
-    combined_data = np.concatenate((cluster_e, cluster_edot, cluster_u), axis=1)
+    combined_data = np.concatenate((cluster_e, cluster_edot, cluster_u, cluster_udot), axis=1)
 
     n_clusters = 2
 
@@ -130,56 +134,91 @@ for i in range(1, 14):
 
     print("Number of slices:", pow(2, i))
 
-    print("Scalar difference between centroids:", centroids_diff)
+    print("Scalar distance between centroids:", centroids_diff)
 
-    cluster_0_amount_of_nm = 0
     cluster_1_amount_of_nm = 0
-    cluster_0_amount_of_m = 0
+    cluster_2_amount_of_nm = 0
     cluster_1_amount_of_m = 0
+    cluster_2_amount_of_m = 0
 
-    for number in combined_data_with_labels[labels==0,1]:
-        if number == 0:
-            cluster_0_amount_of_nm += 1
-        elif number == 1:
-            cluster_0_amount_of_m += 1
-
-    for number in combined_data_with_labels[labels==1,1]:
+    for number in combined_data_with_labels[labels==0,0]:
         if number == 0:
             cluster_1_amount_of_nm += 1
         elif number == 1:
             cluster_1_amount_of_m += 1
 
-    print("Cluster 0 amount of no motion:", round(cluster_0_amount_of_nm/(cluster_0_amount_of_nm + cluster_0_amount_of_m) * 100), "%")
-    print("Cluster 0 amount of motion:", round(cluster_0_amount_of_m/(cluster_0_amount_of_nm + cluster_0_amount_of_m) * 100), "%")
+    for number in combined_data_with_labels[labels==1,0]:
+        if number == 0:
+            cluster_2_amount_of_nm += 1
+        elif number == 1:
+            cluster_2_amount_of_m += 1
+
     print("Cluster 1 amount of no motion:", round(cluster_1_amount_of_nm/(cluster_1_amount_of_nm + cluster_1_amount_of_m) * 100), "%")
     print("Cluster 1 amount of motion:", round(cluster_1_amount_of_m/(cluster_1_amount_of_nm + cluster_1_amount_of_m) * 100), "%")
+    print("Cluster 2 amount of no motion:", round(cluster_2_amount_of_nm/(cluster_2_amount_of_nm + cluster_2_amount_of_m) * 100), "%")
+    print("Cluster 2 amount of motion:", round(cluster_2_amount_of_m/(cluster_2_amount_of_nm + cluster_2_amount_of_m) * 100), "%")
 
+    percentage_diff_cluster_1 = (1 - abs(cluster_1_amount_of_nm/(cluster_1_amount_of_nm + cluster_1_amount_of_m)
+                          - cluster_1_amount_of_m/(cluster_1_amount_of_nm + cluster_1_amount_of_m))) * 100
+    
+    percentage_diff_cluster_2 = (1 - abs(cluster_2_amount_of_nm/(cluster_2_amount_of_nm + cluster_2_amount_of_m)
+                                    - cluster_2_amount_of_m/(cluster_2_amount_of_nm + cluster_2_amount_of_m))) * 100
+    
+    percentage_diff_list.append((percentage_diff_cluster_1 + percentage_diff_cluster_2) / 2)
 
-    print("Inertia/number of slices:", inertia/pow(2, i))
+    inertia_list.append(inertia)
+
+    number_of_slices_list.append(pow(2, i))
+
+    inertia_per_slice_list.append(inertia/pow(2, i))
+    
+    print("Inertia per Slice:", inertia/pow(2, i))
+    print("-----------------------------------")
 
     # ------------------- 3D K-means Plot -------------------
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
 
-    scatter1 = ax.scatter(combined_data[labels == 0, 0], combined_data[labels == 0, 1], combined_data[labels == 0, 2], 
-                        c='red', alpha=0.5, label='Cluster 1')
-    scatter2 = ax.scatter(combined_data[labels == 1, 0], combined_data[labels == 1, 1], combined_data[labels == 1, 2], 
-                        c='blue', alpha=0.5, label='Cluster 2')
-    # scatter3 = ax.scatter(combined_data[labels == 2, 0], combined_data[labels == 2, 1], combined_data[labels == 2, 2],
-                        # c='green', alpha=0.5, label='Cluster 3')
+    # scatter1 = ax.scatter(combined_data[labels == 0, 0], combined_data[labels == 0, 1], combined_data[labels == 0, 2], 
+    #                     c='red', alpha=0.5, label='Cluster 1')
+    # scatter2 = ax.scatter(combined_data[labels == 1, 0], combined_data[labels == 1, 1], combined_data[labels == 1, 2], 
+    #                     c='blue', alpha=0.5, label='Cluster 2')
+    # # scatter3 = ax.scatter(combined_data[labels == 2, 0], combined_data[labels == 2, 1], combined_data[labels == 2, 2],
+    #                     # c='green', alpha=0.5, label='Cluster 3')
 
-    centroid1 = ax.scatter(centroids[0, 0], centroids[0, 1], centroids[0, 2], marker='o', s=200, c='red', label='Centroid 1')
-    centroid2 = ax.scatter(centroids[1, 0], centroids[1, 1], centroids[1, 2], marker='o', s=200, c='blue', label='Centroid 2')
-    # centroid3 = ax.scatter(centroids[2, 0], centroids[2, 1], centroids[2, 2], marker='o', s=200, c='green', label='Centroid 3')
+    # centroid1 = ax.scatter(centroids[0, 0], centroids[0, 1], centroids[0, 2], marker='o', s=200, c='red', label='Centroid 1')
+    # centroid2 = ax.scatter(centroids[1, 0], centroids[1, 1], centroids[1, 2], marker='o', s=200, c='blue', label='Centroid 2')
+    # # centroid3 = ax.scatter(centroids[2, 0], centroids[2, 1], centroids[2, 2], marker='o', s=200, c='green', label='Centroid 3')
 
-    # Show legend
-    plt.legend(handles=[scatter1, scatter2, centroid1, centroid2])
-    # plt.legend(handles=[scatter1, scatter2, scatter3, centroid1, centroid2, centroid3])
+    # # Show legend
+    # plt.legend(handles=[scatter1, scatter2, centroid1, centroid2])
+    # # plt.legend(handles=[scatter1, scatter2, scatter3, centroid1, centroid2, centroid3])
 
-    ax.set_xlabel('e')
-    ax.set_ylabel('e_dot')
-    ax.set_zlabel('u')
-    ax.set_title('K-means Clustering')
-    plt.legend()
-    plt.show()
+    # ax.set_xlabel('e')
+    # ax.set_ylabel('e_dot')
+    # ax.set_zlabel('u')
+    # ax.set_title('K-means Clustering')
+    # plt.legend()
+    # plt.show()
+
+# ------------------- Inertia per Slice and Percentage Difference vs Number of Slices -------------------
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+# Inertia per Slice vs Number of Slices
+ax1.scatter(number_of_slices_list, inertia_per_slice_list)
+ax1.set_xscale('log')
+ax1.set_xlabel('Number of Slices')
+ax1.set_ylabel('Inertia per Slice')
+ax1.set_title('Inertia per Slice vs Number of Slices')
+
+# Percentage Difference vs Number of Slices
+ax2.scatter(number_of_slices_list, percentage_diff_list)
+ax2.set_xscale('log')
+ax2.set_xlabel('Number of Slices')
+ax2.set_ylabel('Percentage Difference')
+ax2.set_title('Percentage Difference vs Number of Slices')
+
+plt.tight_layout()
+plt.show()
