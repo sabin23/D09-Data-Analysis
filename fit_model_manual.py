@@ -81,6 +81,7 @@ def cost_function_pm(parameters, w, Hpe_data, Hpxd_data):
     # print(cost)
     return cost
 
+optimized_parameters = []
 
 def plot():
     w_FC = data.w_FC
@@ -91,7 +92,7 @@ def plot():
     opt_response_hpe = H_pe(opt_parameters, w_FC)
     opt_response_hpxd = H_pxd(opt_parameters, w_FC)
     opt_response = opt_response_hpe + opt_response_hpxd
-
+    oprimized_parameters = opt_parameters
 
     # Get magnitude and phase of numbers in Hpe_FC
     Hpe_FC = Hpe_data
@@ -149,12 +150,13 @@ def plot():
     fig, axs = plt.subplots(2)
 
     # Plot the magnitude of Hpe_FC in the first subplot
-    axs[0].loglog(w_FC, magnitude_Hpe, label='Hpe')
-    axs[0].loglog(w_FC, magnitude_Hpxd, label='Hpxd')
-    axs[0].loglog(w_FC, magnitude_response, label='Initial Guess')
-    axs[0].loglog(w_FC, magnitude_opt_response, label='Optimized')
-    axs[0].loglog(w_FC, magnitude_opt_response_hpe, label='Optimized Hpe')
-    axs[0].loglog(w_FC, magnitude_opt_response_hpxd, label='Optimized Hpxd')
+    
+    axs[0].loglog(w_FC, magnitude_Hpe, label='Hpe', color='deepskyblue')
+    axs[0].loglog(w_FC, magnitude_Hpxd, label='Hpxd', color='orange')
+    # axs[0].loglog(w_FC, magnitude_response, label='Initial Guess')
+    axs[0].loglog(w_FC, magnitude_opt_response_hpe, label='Optimized Hpe', linestyle='dashed', color='deepskyblue')
+    axs[0].loglog(w_FC, magnitude_opt_response_hpxd, label='Optimized Hpxd', linestyle='dashed', color='orange')
+    axs[0].loglog(w_FC, magnitude_opt_response, label='Optimized', color='tomato')
     axs[0].set_title('Magnitude of Hpe_FC')
     axs[0].set_xlabel('Frequency (Hz)')
     axs[0].set_ylabel('Magnitude')
@@ -162,13 +164,14 @@ def plot():
     axs[0].legend()
 
     # Plot the phase of Hpe_FC in the second subplot
-    axs[1].semilogx(w_FC, phase_Hpe, label='Hpe')
-    axs[1].semilogx(w_FC, phase_Hpxd, label='Hpxd')
-    axs[1].semilogx(w_FC, phase_response, label='Initial Guess')
-    axs[1].semilogx(w_FC, phase_opt_response, label='Optimized')
-    axs[1].semilogx(w_FC, phase_opt_response_hpe, label='Optimized Hpe')
-    axs[1].semilogx(w_FC, phase_opt_response_hpxd, label='Optimized Hpxd')
-    axs[1].set_title('Phase of Hpe_FC')
+    
+    axs[1].semilogx(w_FC, phase_Hpe, label='Hpe', color='deepskyblue')
+    axs[1].semilogx(w_FC, phase_Hpxd, label='Hpxd', color='orange')
+    # axs[1].semilogx(w_FC, phase_response, label='Initial Guess')
+    axs[1].semilogx(w_FC, phase_opt_response_hpe, label='Optimized Hpe', linestyle='dashed', color='deepskyblue')
+    axs[1].semilogx(w_FC, phase_opt_response_hpxd, label='Optimized Hpxd', linestyle='dashed', color='orange')
+    axs[1].semilogx(w_FC, phase_opt_response, label='Optimized', color='tomato')
+    #axs[1].set_title('Phase of Hpe_FC')
     axs[1].set_xlabel('Frequency (Hz)')
     axs[1].set_ylabel('Phase (degrees)')
     axs[1].grid()
@@ -189,46 +192,51 @@ def boxplots_hpe():
     K_m_arr = [[], [], []]
     tau_m_arr = [[], [], []]
     
-    for condition in range(3, 6):
-        for subject in range(6):
-            data = Data(subject + 1, condition + 1)
+    for condition in range(3, 7):
+        for subject in range(1, 7):
+            data = Data(subject, condition)
             Hpe_data = data.Hpe_FC
             Hpxd_data = data.Hpxd_FC
             w_FC = data.w_FC
-            """
-            Change vehicle initial conditions here
-            """
+            
             optimized_parameters = opt.fmin(cost_function_pm, initial_parameters[vehicle], args=(w_FC, Hpe_data, Hpxd_data))
-            """
-            """
-            K_pe_arr[condition].append(optimized_parameters[0])
-            t_lead_arr[condition].append(optimized_parameters[1])
-            t_lag_arr[condition].append(optimized_parameters[2])
-            tau_arr[condition].append(optimized_parameters[3])
-            omega_nm_arr[condition].append(optimized_parameters[4])
-            zeta_nm_arr[condition].append(optimized_parameters[5])
-            K_m_arr[condition].append(optimized_parameters[6])
-            tau_m_arr[condition].append(optimized_parameters[7])
+            
+            K_pe_arr[condition - 4].append(optimized_parameters[0])
+            t_lead_arr[condition - 4].append(optimized_parameters[1])
+            t_lag_arr[condition - 4].append(optimized_parameters[2])
+            tau_arr[condition - 4].append(optimized_parameters[3])
+            omega_nm_arr[condition - 4].append(optimized_parameters[4])
+            zeta_nm_arr[condition - 4].append(optimized_parameters[5])
+            K_m_arr[condition - 4].append(optimized_parameters[6])
+            tau_m_arr[condition - 4].append(optimized_parameters[7])
 
-
+    print(tau_m_arr)
     # make 8 plots, 1 for each parameter, with 3 boxplots, 1 for each condition
     fig, axs = plt.subplots(2, 4)
-    axs[0, 0].boxplot(K_pe_arr, showfliers=False)
+    axs[0, 0].boxplot(K_pe_arr)#, showfliers=False)
     axs[0, 0].set_title('K_pe')
-    axs[0, 1].boxplot(t_lead_arr, showfliers=False)
+    axs[0, 0].set_yscale('log')
+    axs[0, 1].boxplot(t_lead_arr)#, showfliers=False)
     axs[0, 1].set_title('t_lead')
-    axs[0, 2].boxplot(t_lag_arr, showfliers=False)
+    axs[0, 1].set_yscale('log')
+    axs[0, 2].boxplot(t_lag_arr)#, showfliers=False)
     axs[0, 2].set_title('t_lag')
-    axs[0, 3].boxplot(tau_arr, showfliers=False)
+    axs[0, 2].set_yscale('log')
+    axs[0, 3].boxplot(tau_arr)#, showfliers=False)
     axs[0, 3].set_title('tau')
-    axs[1, 0].boxplot(omega_nm_arr, showfliers=False)
+    axs[0, 3].set_yscale('log')
+    axs[1, 0].boxplot(omega_nm_arr)#, showfliers=False)
     axs[1, 0].set_title('omega_nm')
-    axs[1, 1].boxplot(zeta_nm_arr, showfliers=False)
+    axs[1, 0].set_yscale('log')
+    axs[1, 1].boxplot(zeta_nm_arr)#, showfliers=False)
     axs[1, 1].set_title('zeta_nm')
-    axs[1, 2].boxplot(K_m_arr, showfliers=False)
+    axs[1, 1].set_yscale('log')
+    axs[1, 2].boxplot(K_m_arr)#, showfliers=False)
     axs[1, 2].set_title('K_m')
+    axs[1, 1].set_yscale('log')
     axs[1, 3].boxplot(tau_m_arr, showfliers=False)
     axs[1, 3].set_title('tau_m')
+    axs[1, 1].set_yscale('log')
 
     plt.show()
 
