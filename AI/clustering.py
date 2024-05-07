@@ -211,7 +211,7 @@ for i in range(1, 14):
 
     # ------------------- 3D K-means Plot -------------------
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection="3d")
 
     scatter1 = ax.scatter(
@@ -265,6 +265,8 @@ for i in range(1, 14):
     colorbar_2.set_label("u_dot cluster 2")
     plt.legend()
     plt.show()
+
+
 
 # ------------------- Inertia per Slice and Percentage Difference vs Number of Slices -------------------
 
