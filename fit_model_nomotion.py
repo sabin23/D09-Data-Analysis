@@ -4,8 +4,8 @@ from get_data import Data
 import matplotlib.pyplot as plt
 
 # Data: subject, condition
-subject = 2
-condition = 5
+subject = 6
+condition = 3
 run = 4
 data = Data(subject, condition)
 
@@ -134,8 +134,8 @@ def plot():
     # axs[1].semilogx(w_FC, phase_response, label='Initial Guess')
     axs[1].semilogx(w_FC, phase_opt_response, label='Optimized', color='tomato')
     #axs[1].set_title('Phase of Hpe_FC')
-    axs[1].set_xlabel('Frequency (Hz)')
-    axs[1].set_ylabel('Phase (degrees)')
+    axs[1].set_xlabel('Frequency [Hz]')
+    axs[1].set_ylabel('Phase [Deg]')
     axs[1].grid()
     axs[1].legend()
 
@@ -152,14 +152,14 @@ def boxplots_hpe():
     omega_nm_arr = [[], [], []]
     zeta_nm_arr = [[], [], []]
     
-    for condition in range(3, 7):
+    for condition in range(4, 7):
         for subject in range(1, 7):
             data = Data(subject, condition)
             Hpe_data = data.Hpe_FC
             Hpxd_data = data.Hpxd_FC
             w_FC = data.w_FC
             
-            optimized_parameters = opt.fmin(cost_function, initial_parameters[vehicle], args=(w_FC, Hpe_data, Hpxd_data))
+            optimized_parameters = opt.fmin(cost_function, initial_parameters[condition - 4], args=(w_FC, Hpe_data, Hpxd_data))
             
             K_pe_arr[condition - 4].append(optimized_parameters[0])
             t_lead_arr[condition - 4].append(optimized_parameters[1])
@@ -172,25 +172,25 @@ def boxplots_hpe():
     # make 8 plots, 1 for each parameter, with 3 boxplots, 1 for each condition
     fig, axs = plt.subplots(2, 3)
     axs[0, 0].boxplot(K_pe_arr, showfliers=False)
-    axs[0, 0].set_title('K_pe')
+    axs[0, 0].set_title('K_pe [s]')
     #axs[0, 0].set_yscale('log')
     axs[0, 1].boxplot(t_lead_arr, showfliers=False)
-    axs[0, 1].set_title('t_lead')
+    axs[0, 1].set_title('t_lead [s]')
     #axs[0, 1].set_yscale('log')
     axs[0, 2].boxplot(t_lag_arr, showfliers=False)
-    axs[0, 2].set_title('t_lag')
+    axs[0, 2].set_title('t_lag [s]')
     #axs[0, 2].set_yscale('log')
     axs[1, 0].boxplot(tau_arr, showfliers=False)
-    axs[1, 0].set_title('tau')
+    axs[1, 0].set_title('tau [s]')
     #axs[0, 3].set_yscale('log')
     axs[1, 1].boxplot(omega_nm_arr, showfliers=False)
-    axs[1, 1].set_title('omega_nm')
+    axs[1, 1].set_title('omega_nm [rad/s]')
     #axs[1, 0].set_yscale('log')
     axs[1, 2].boxplot(zeta_nm_arr, showfliers=False)
-    axs[1, 2].set_title('zeta_nm')
+    axs[1, 2].set_title('zeta_nm [-]')
     #axs[1, 1].set_yscale('log')
 
     plt.show()
 
-boxplots_hpe()
+# boxplots_hpe()
 
