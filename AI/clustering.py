@@ -207,44 +207,7 @@ for i in range(1, 14):
 
     print("Inertia per Slice:", inertia / pow(2, i))
     print("-----------------------------------")
-    print(
-        "Cluster 1 amount of no motion:",
-        round(
-            cluster_1_amount_of_nm
-            / (cluster_1_amount_of_nm + cluster_1_amount_of_m)
-            * 100
-        ),
-        "%",
-    )
-    print(
-        "Cluster 1 amount of motion:",
-        round(
-            cluster_1_amount_of_m
-            / (cluster_1_amount_of_nm + cluster_1_amount_of_m)
-            * 100
-        ),
-        "%",
-    )
-    print(
-        "Cluster 2 amount of no motion:",
-        round(
-            cluster_2_amount_of_nm
-            / (cluster_2_amount_of_nm + cluster_2_amount_of_m)
-            * 100
-        ),
-        "%",
-    )
-    print(
-        "Cluster 2 amount of motion:",
-        round(
-            cluster_2_amount_of_m
-            / (cluster_2_amount_of_nm + cluster_2_amount_of_m)
-            * 100
-        ),
-        "%",
-    )
-
-    print("Inertia/number of slices:", inertia / pow(2, i))
+    
 
     # ------------------- 3D K-means Plot -------------------
 
