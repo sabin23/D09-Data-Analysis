@@ -4,7 +4,7 @@ from get_data import Data
 import matplotlib.pyplot as plt
 
 # Data: subject, condition
-subject = 6
+subject = 5
 condition = 3
 run = 4
 data = Data(subject, condition)
@@ -123,8 +123,8 @@ def plot():
     axs[0].loglog(w_FC, magnitude_Hpe, label='Hpe', color='deepskyblue')
     # axs[0].loglog(w_FC, magnitude_response, label='Initial Guess')
     axs[0].loglog(w_FC, magnitude_opt_response, label='Optimized', color='tomato')
-    axs[0].set_xlabel('Frequency (Hz)')
-    axs[0].set_ylabel('Magnitude')
+    axs[0].set_xlabel('Frequency [Hz]')
+    axs[0].set_ylabel('Magnitude [Deg]')
     axs[0].grid()
     axs[0].legend()
 
@@ -170,27 +170,37 @@ def boxplots_hpe():
 
 
     # make 8 plots, 1 for each parameter, with 3 boxplots, 1 for each condition
-    fig, axs = plt.subplots(2, 3)
+    fig, axs = plt.subplots(3, 2)
     axs[0, 0].boxplot(K_pe_arr, showfliers=False)
     axs[0, 0].set_title('K_pe [s]')
     #axs[0, 0].set_yscale('log')
     axs[0, 1].boxplot(t_lead_arr, showfliers=False)
     axs[0, 1].set_title('t_lead [s]')
     #axs[0, 1].set_yscale('log')
-    axs[0, 2].boxplot(t_lag_arr, showfliers=False)
-    axs[0, 2].set_title('t_lag [s]')
+    axs[1, 0].boxplot(t_lag_arr, showfliers=False)
+    axs[1, 0].set_title('t_lag [s]')
     #axs[0, 2].set_yscale('log')
-    axs[1, 0].boxplot(tau_arr, showfliers=False)
-    axs[1, 0].set_title('tau [s]')
+    axs[1, 1].boxplot(tau_arr, showfliers=False)
+    axs[1, 1].set_title('tau [s]')
     #axs[0, 3].set_yscale('log')
-    axs[1, 1].boxplot(omega_nm_arr, showfliers=False)
-    axs[1, 1].set_title('omega_nm [rad/s]')
+    axs[2, 0].boxplot(omega_nm_arr, showfliers=False)
+    axs[2, 0].set_title('omega_nm [rad/s]')
     #axs[1, 0].set_yscale('log')
-    axs[1, 2].boxplot(zeta_nm_arr, showfliers=False)
-    axs[1, 2].set_title('zeta_nm [-]')
+    axs[2, 1].boxplot(zeta_nm_arr, showfliers=False)
+    axs[2, 1].set_title('zeta_nm [-]')
     #axs[1, 1].set_yscale('log')
+    print("kpe_arr_nm=", K_pe_arr)
+    print("t_lead_arr_nm=", t_lead_arr)
+    print("t_lag_arr_nm=", t_lag_arr)
+    print("tau_arr_nm=", tau_arr)
+    print("omega_nm_arr=", omega_nm_arr)
+    print("zeta_nm_arr=", zeta_nm_arr)
+    
 
+
+    
+    plt.tight_layout()
     plt.show()
 
-# boxplots_hpe()
+boxplots_hpe()
 
